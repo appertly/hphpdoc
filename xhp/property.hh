@@ -66,7 +66,7 @@ class :hphpdoc:property extends :x:element implements HasXHPHelpers
                         <hphpdoc:typehints tokens={$rt}/>
                     </code>
                     {" "}
-                    <code class="property-name">{$m->getName()}</code>
+                    <code class="property-name"><var>{$m->getName()}</var></code>
                 </h1>
             </header>
             <div class="property-details">

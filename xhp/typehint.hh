@@ -64,7 +64,7 @@ class :hphpdoc:typehint extends :x:element implements HasXHPHelpers
             if ($tbn->containsKey($sc->getNamespaceName() . '\\' . $base)) {
                 $tag->appendChild(<code class="ref"><a href={$this->getFilename($tbn[$sc->getNamespaceName() . '\\' . $base])}>{$base}</a></code>);
             } elseif ($gens->linearSearch($base) > -1) {
-                $tag->appendChild(<code class="generic-ref">{$base}</code>);
+                $tag->appendChild(<code class="generic-ref"><var>{$base}</var></code>);
             } else {
                 $tag->appendChild(<code class="ref">{$base}</code>);
             }

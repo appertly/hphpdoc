@@ -74,6 +74,10 @@ class Publisher
         }
         ksort($namespaces);
         $job = new Job($destination, $tokens);
+        $this->writer->copy(
+            dirname(__DIR__) . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'styles.css',
+            "$destination/styles.css"
+        );
         \HH\Asio\join(\HH\Asio\v($this->doNamespaces($job, $namespaces)));
     }
 

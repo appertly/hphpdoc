@@ -38,18 +38,18 @@ class :hphpdoc:parameters extends :x:element implements HasXHPHelpers
             if ($k > 0) {
                 $tag->appendChild(<span class="separator-parameter">{", "}</span>);
             }
-            $p = <span class="parameter"/>;
+            $p = <code class="parameter"/>;
             $p->appendChild(<hphpdoc:typehint token={$param->getTypehint()}/>);
             if ($param->isVariadic()) {
-                $p->appendChild(<code class="variadic">...</code>);
+                $p->appendChild(<span class="variadic">...</span>);
             }
             $p->appendChild(" ");
             if ($param->isPassedByReference()) {
-                $p->appendChild(<code class="parameter-reference">{"&"}"</code>);
+                $p->appendChild(<span class="parameter-reference">{"&"}"</span>);
             }
-            $p->appendChild(<code class="parameter-name">{'$'}{$param->getName()}</code>);
+            $p->appendChild(<var class="parameter-name">{'$'}{$param->getName()}</var>);
             if ($param->isOptional()) {
-                $p->appendChild(<code class="parameter-default">{" = "}{$param->getDefaultString()}</code>);
+                $p->appendChild(<kbd class="parameter-default">{" = "}{$param->getDefaultString()}</kbd>);
             }
             $tag->appendChild($p);
         }

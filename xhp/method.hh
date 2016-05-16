@@ -129,7 +129,7 @@ class :hphpdoc:method extends :x:element implements HasXHPHelpers
             }
             $tbody->appendChild(
                 <tr>
-                    <th scope="row"><code>{"$"}{$p->getName()}</code></th>
+                    <th scope="row"><code class="parameter-name"><var>{"$"}{$p->getName()}</var></code></th>
                     <td><hphpdoc:typehints tokens={$rt}/></td>
                     <td>{$description}</td>
                 </tr>

@@ -80,7 +80,8 @@ trait Producer
     {
         $page = new Page();
         return $page->setTitle($title)
-            ->addMeta('generator', 'hphpdoc ' . Version::VERSION);
+            ->addMeta('generator', 'hphpdoc ' . Version::VERSION)
+            ->addStylesheet('styles.css');
     }
 
     /**

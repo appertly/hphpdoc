@@ -47,7 +47,7 @@ class :hphpdoc:generics extends :x:element implements HasXHPHelpers
             } elseif ($t->isCovariant()) {
                 $tag->appendChild(<code class="generic-variance" title="Covariant">+</code>);
             }
-            $tag->appendChild(<code class="generic-type">{$t->getName()}</code>);
+            $tag->appendChild(<code class="generic-type"><var>{$t->getName()}</var></code>);
             if ($t->getConstraintRelationship() !== null) {
                 $tag->appendChild(<code class="generic-constraint">{" " . $t->getConstraintRelationship() . " "}</code>);
                 $tag->appendChild(<code class="generic-constrainttype">{$t->getConstraintTypeName()}</code>);

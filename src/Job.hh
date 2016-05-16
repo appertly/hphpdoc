@@ -23,11 +23,6 @@ use FredEmmott\DefinitionFinder\ScannedBase;
 
 /**
  * Contains details of a job run.
- *
- * @author Jonathan Hawk
- * @author double compile <doublecompile@gmail.com>
- * @copyright 2016 Appertly
- * @copyright 2016 Acme, Inc.
  */
 class Job
 {

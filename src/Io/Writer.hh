@@ -43,6 +43,24 @@ class Writer
     }
 
     /**
+     * Copies a file from one place to another.
+     *
+     * @param $source - The source file
+     * @param $destination - The destination
+     */
+    public function copy(string $source, string $destination): void
+    {
+        if (!file_exists($destination)) {
+            $this->mkdir(dirname($destination));
+        }
+        try {
+            copy($source, $destination);
+        } catch (\Exception $e) {
+            throw new IoException("Could not copy: $source to $destination", 0, $e);
+        }
+    }
+
+    /**
      * Writes a file.
      *
      * @param $filename - The file to write
