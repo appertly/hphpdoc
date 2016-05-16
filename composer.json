@@ -3,6 +3,7 @@
     "description": "An API documentation generator for Hack/HHVM and PHP",
     "keywords": ["hack", "hhvm", "php", "api", "documentation"],
     "homepage": "http://github.com/appertly/hphpdoc",
+    "license": "Apache-2.0",    
     "require": {
         "hhvm": "~3.12",
         "fredemmott/definition-finder": "^1.1.0",
