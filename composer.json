@@ -1,0 +1,25 @@
+{
+    "name": "appertly/hphpdoc",
+    "description": "An API documentation generator for Hack/HHVM and PHP",
+    "keywords": ["hack", "hhvm", "php", "api", "documentation"],
+    "homepage": "http://github.com/appertly/hphpdoc",
+    "require": {
+        "hhvm": "~3.12",
+        "fredemmott/definition-finder": "^1.1.0",
+        "appertly/cleopatra": "~0.1",
+        "appertly/axe": "~0.1"
+    },
+    "require-dev": {
+        "hackpack/hackunit": "~0.6",
+        "libreworks/psr3-log-hhi": "~1.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+          "Hphpdoc\\": "src/"
+        },
+        "classmap": [
+            "xhp"
+        ]
+    },
+    "bin": ["bin/hphpdoc"]
+}

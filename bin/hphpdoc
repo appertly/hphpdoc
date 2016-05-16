@@ -1,0 +1,22 @@
+#!/usr/bin/env hhvm
+<?hh
+
+$dir = __DIR__;
+do {
+    if (file_exists("$dir/composer.json") && file_exists("$dir/vendor/autoload.php")) {
+        require_once "$dir/vendor/autoload.php";
+        break;
+    }
+    $dir = dirname($dir);
+    if ($dir === '/' || $dir === '.') {
+        fwrite(STDERR,
+            'You have to set up the project dependencies using the following commands:' . PHP_EOL .
+            'curl -s http://getcomposer.org/installer | hhvm' . PHP_EOL .
+            'php composer.phar install' . PHP_EOL
+        );
+        exit(1);
+    }
+} while (true);
+
+$runner = new Hphpdoc\Runner();
+$runner->run($_SERVER['argv']);
