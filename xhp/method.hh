@@ -52,16 +52,20 @@ class :hphpdoc:method extends :x:element implements HasXHPHelpers
         }
         return <section id={"method_" . $m->getName()} class="method-section">
             <header>
-                <h1 class="method-signature">
-                    {$m->isStatic() ? 'static ' : ''}
-                    {$m->isPublic() ? 'public ' : ''}
-                    {$m->isProtected() ? 'protected ' : ''}
-                    <code class="method-name">{$m->getName()}</code>
-                    <hphpdoc:generics generics={$m->getGenericTypes()}/>
-                    <hphpdoc:parameters params={$m->getParameters()}/>
+                <h1>
+                    {$m->getName()}
                 </h1>
                 {$labels}
             </header>
+            <div class="method-signature">
+                {$m->isStatic() ? 'static ' : ''}
+                {$m->isPublic() ? 'public ' : ''}
+                {$m->isProtected() ? 'protected ' : ''}
+                {"function "}
+                <code class="method-name">{$m->getName()}</code>
+                <hphpdoc:generics generics={$m->getGenericTypes()}/>
+                <hphpdoc:parameters params={$m->getParameters()}/>
+            </div>
             <div class="method-details">
                 <p class="method-summary">{$phpdoc->getSummary()}</p>
                 <div class="method-description">

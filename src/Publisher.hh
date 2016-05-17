@@ -95,15 +95,17 @@ class Publisher
             $awaits->addAll($this->doNamespace($job, $n, $tokens));
         }
         $xhp = <axe:layout page={$page}>
+            <hphpdoc:banner/>
             <main>
                 <header>
                     <h1>Namespaces</h1>
                 </header>
                 <hphpdoc:namespaces-list namespaces={$namespaces->keys()}/>
             </main>
+            <hphpdoc:footer/>
         </axe:layout>;
         $destination = $job->getDestination();
-        $awaits[] = $this->writer->write($job->getDestination() . DIRECTORY_SEPARATOR . "namespaces.html", $xhp);
+        $awaits[] = $this->writer->write($job->getDestination() . DIRECTORY_SEPARATOR . "index.html", $xhp);
         return $awaits;
     }
 
@@ -125,7 +127,9 @@ class Publisher
             }
         }
         $xhp = <axe:layout page={$page}>
+            <hphpdoc:banner/>
             <hphpdoc:namespace namespace={$namespace} tokens={$tokens} tokensByName={$job->getTokensByName()} />
+            <hphpdoc:footer/>
         </axe:layout>;
         $xhp->setContext('job', $job);
         $xhp->setContext('docParser', $this->commentParser);
@@ -145,7 +149,9 @@ class Publisher
         $block = $block === null ? $this->commentParser->parse($c) : $block;
         $page = $this->getPage('Class ' . $c->getName());
         $xhp = <axe:layout page={$page}>
+            <hphpdoc:banner/>
             <hphpdoc:classlike block={$block}/>
+            <hphpdoc:footer/>
         </axe:layout>;
         $xhp->setContext('job', $job);
         $xhp->setContext('scannedClass', $c);

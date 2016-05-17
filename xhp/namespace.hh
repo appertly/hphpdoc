@@ -41,8 +41,15 @@ class :hphpdoc:namespace extends :x:element implements HasXHPHelpers
     {
         $namespace = $this->:namespace;
         $tokens = new Vector($this->:tokens);
+        $breadcrumbs = <x:frag/>;
+        if (strpos($namespace, '\\') !== false) {
+            $breadcrumbs = <ul class="breadcrumb">
+                <li>In Namespace <hphpdoc:namespace-link namespace={substr($namespace, 0, strrpos($namespace, "\\"))} /></li>
+            </ul>;
+        }
         $main = <main role="main">
             <header>
+                {$breadcrumbs}
                 <h1>Namespace {$namespace}</h1>
             </header>
         </main>;

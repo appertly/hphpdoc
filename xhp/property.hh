@@ -58,17 +58,18 @@ class :hphpdoc:property extends :x:element implements HasXHPHelpers
         }
         return <section id={"property_" . $m->getName()} class="property-section">
             <header>
-                <h1 class="property-signature">
-                    {$m->isStatic() ? 'static ' : ''}
-                    {$m->isPublic() ? 'public ' : ''}
-                    {$m->isProtected() ? 'protected ' : ''}
-                    <code class="property-type">
-                        <hphpdoc:typehints tokens={$rt}/>
-                    </code>
-                    {" "}
-                    <code class="property-name"><var>{$m->getName()}</var></code>
-                </h1>
+                <h1>${$m->getName()}</h1>
             </header>
+            <div class="property-signature">
+                {$m->isStatic() ? 'static ' : ''}
+                {$m->isPublic() ? 'public ' : ''}
+                {$m->isProtected() ? 'protected ' : ''}
+                <code class="property-type">
+                    <hphpdoc:typehints tokens={$rt}/>
+                </code>
+                {" "}
+                <code class="property-name"><var>${$m->getName()}</var></code>
+            </div>
             <div class="property-details">
                 <p class="property-summary">{$summary}</p>
                 <div class="property-description">

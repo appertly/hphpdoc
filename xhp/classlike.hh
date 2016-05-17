@@ -69,12 +69,12 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
         $main = <main role="main">
             <header>
                 <ul class="breadcrumb">
-                    <li>Namespace <hphpdoc:namespace-link namespace={$sc->getNamespaceName()}/></li>
+                    <li>In Namespace <hphpdoc:namespace-link namespace={$sc->getNamespaceName()}/></li>
                 </ul>
                 <h1>
+                    <span class="token-type">{$sc->isTrait() ? "Trait" : ($sc->isInterface() ? "Interface" : "Class")}</span>
+                    {" "}
                     <span class="class-name">
-                        {$sc->isTrait() ? "Trait" : ($sc->isInterface() ? "Interface" : "Class")}
-                        {" "}
                         {$sc->getShortName()}
                     </span>
                     <hphpdoc:generics generics={$sc->getGenericTypes()}/>

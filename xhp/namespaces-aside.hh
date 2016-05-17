@@ -19,34 +19,28 @@
  */
 
 /**
- * Renders a link to a namespace
+ * Renders an aside of namespaces.
  */
-class :hphpdoc:namespace-link extends :x:element implements HasXHPHelpers
+class :hphpdoc:namespaces-aside extends :x:element implements HasXHPHelpers
 {
     use XHPHelpers;
 
-    category %flow, %phrase, %interactive;
+    category %flow;
     children empty;
-    attribute :xhp:html-element,
-        string namespace @required;
+    attribute :aside,
+        Traversable<string> namespaces @required;
 
     protected function render(): XHPRoot
     {
-        $n = $this->:namespace;
-        $this->addClass('namespace');
-        if ($n === '') {
-            return <a href="namespace-.html">\</a>;
-        } else {
-            $a = <span/>;
-            $last = '';
-            foreach (explode("\\", $n) as $i => $v) {
-                $last .= $last === '' ? $v : "\\$v";
-                if ($i > 0) {
-                    $a->appendChild("\\");
-                }
-                $a->appendChild(<a href={"namespace-" . str_replace('\\', '_', $last) . '.html'} title={"Namespace $last"}>{$v}</a>);
-            }
-            return $a;
+        $namespaces = $this->:namespaces;
+        if (count($namespaces) == 0) {
+            return <x:frag />;
         }
+        return <aside>
+            <header>
+                <h1>Namespaces</h1>
+            </header>
+            <hphpdoc:namespaces-list namespaces={$namespaces}/>
+        </aside>;
     }
 }

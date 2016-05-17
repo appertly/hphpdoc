@@ -64,6 +64,19 @@ class Job
     }
 
     /**
+     * Gets the namespaces of the tokens.
+     *
+     * @return - The token namespaces
+     */
+    <<__Memoize>>
+    public function getNamespaces(): ImmSet<string>
+    {
+        $namespaces = $this->tokens->values()->map($a ==> $a->getNamespaceName())->toVector();
+        sort($namespaces);
+        return $namespaces->toImmSet();
+    }
+
+    /**
      * Gets the tokens.
      *
      * @return - The scanned tokens

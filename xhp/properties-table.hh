@@ -83,7 +83,7 @@ class :hphpdoc:properties-table extends :x:element implements HasXHPHelpers
                     }
                     $tbody->appendChild(
                         <tr>
-                            <th scope="row"><code class="property-name"><a href={"#property_" . $m->getName()}>{$m->getName()}</a></code></th>
+                            <th scope="row"><code class="property-name"><var><a href={"#property_" . $m->getName()}>${$m->getName()}</a></var></code></th>
                             <td><hphpdoc:typehints tokens={$rt}/></td>
                             <td><div class="property-summary">{$summary}</div></td>
                         </tr>

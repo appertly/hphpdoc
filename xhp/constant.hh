@@ -58,16 +58,17 @@ class :hphpdoc:constant extends :x:element implements HasXHPHelpers
         }
         return <section id={"constant_" . $m->getName()} class="constant-section">
             <header>
-                <h1 class="constant-signature">
-                    <code class="constant-type">
-                        <hphpdoc:typehints tokens={$rt}/>
-                    </code>
-                    {" "}
-                    <code class="constant-name">{$m->getName()}</code>
-                    <code class="separator-constant">{" = "}</code>
-                    <code class="constant-value">{$m->getValue()}</code>
-                </h1>
+                <h1>{$m->getName()}</h1>
             </header>
+            <div class="constant-signature">
+                <code class="constant-type">
+                    <hphpdoc:typehints tokens={$rt}/>
+                </code>
+                {" "}
+                <code class="constant-name">{$m->getName()}</code>
+                <code class="separator-constant">{" = "}</code>
+                <code class="constant-value">{$m->getValue()}</code>
+            </div>
             <div class="constant-details">
                 <p class="constant-summary">{$summary}</p>
                 <div class="constant-description">
