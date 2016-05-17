@@ -45,3 +45,48 @@ For example:
 ```
 hphpdoc -v -x tests -o build/api .
 ```
+## PHPDoc Syntax
+
+For the most part, we're trying to cover everything in
+[PSR-5](https://github.com/phpDocumentor/fig-standards/blob/master/proposed/phpdoc.md).
+This initial release covers many tags, but not all of them just yet.
+
+Being that Hack has more strict typehints than PHP 5, you can omit types from your `@var`, `@param`, and `@return` PHPDoc tags if you choose!
+
+```hack
+/**
+ * @var You can omit the type here, or…
+ */
+protected string $something = "nothing";
+/**
+ * …you can just specify a description here. The type is detected automatically!
+ */
+protected Vector<string> $test = Vector{'foo'};
+/**
+ * This is my method.
+ *
+ * This is a description.
+ *
+ * @param $name - The name
+ * @param $numbers - The numbers
+ * @param $log - The log
+ * @return - The thing you need. Always specify a dash before description.
+ * @throws \RuntimeException if anything goes wrong
+ */
+public function getFoo(string $name, ConstVector<int> $numbers, Psr\Log\LoggerInterface $log): ?Foo<Bar>
+{
+    return null;
+}
+```
+
+If your return type or parameter typehint is `mixed`, hphpdoc will fall back to the PHPDoc tag type, if one is specified. Example:
+
+```hack
+/**
+ * @return array<string>|string|null The return type
+ */
+function nope(): mixed
+{
+    return null;
+}
+```
