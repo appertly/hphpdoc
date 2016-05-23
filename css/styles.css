@@ -193,6 +193,12 @@ a:hover {
     width: 61.803%;
 }
 
+td .constant-summary p,
+td .property-summary p,
+td .method-summary p
+{
+    margin: 0;
+}
 
 .tags-parameters tr > * {
     text-align: center;

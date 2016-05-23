@@ -42,6 +42,12 @@ class :hphpdoc:property extends :x:element implements HasXHPHelpers
         if (!($parser instanceof Hphpdoc\Doc\Parser)) {
             $parser = new Hphpdoc\Doc\Parser();
         }
+        $mdParser = $this->getContext('markdownParser');
+        if (!($mdParser instanceof League\CommonMark\DocParser)) {
+            $mdParser = new League\CommonMark\DocParser(
+                League\CommonMark\Environment::createCommonMarkEnvironment()
+            );
+        }
         $phpdoc = $parser->parse($m);
         $summary = trim($phpdoc->getSummary());
         $rt = Vector{$m->getTypehint()};
@@ -71,9 +77,9 @@ class :hphpdoc:property extends :x:element implements HasXHPHelpers
                 <code class="property-name"><var>${$m->getName()}</var></code>
             </div>
             <div class="property-details">
-                <p class="property-summary">{$summary}</p>
+                <div class="property-summary"><axe:markdown text={$summary} docParser={$mdParser}/></div>
                 <div class="property-description">
-                    <axe:paragraphs text={$phpdoc->getDescription()}/>
+                    <axe:markdown text={$phpdoc->getDescription()} docParser={$mdParser}/>
                 </div>
                 <hphpdoc:authorship block={$phpdoc}/>
                 <hphpdoc:versions block={$phpdoc}/>

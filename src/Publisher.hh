@@ -24,6 +24,8 @@ use FredEmmott\DefinitionFinder\ScannedBase;
 use FredEmmott\DefinitionFinder\ScannedClass;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerAwareTrait;
+use League\CommonMark\DocParser;
+use League\CommonMark\Environment;
 
 /**
  * Publishes Stuff
@@ -34,14 +36,19 @@ class Publisher
     use Producer;
 
     /**
-     * @var The file writer
+     * The file writer
      */
     protected Io\Writer $writer;
 
     /**
-     * @var The comment parser
+     * The comment parser
      */
     protected Doc\Parser $commentParser;
+
+    /**
+     * The markdown parser
+     */
+    protected DocParser $mdParser;
 
     /**
      * Create a new Publisher.
@@ -53,6 +60,7 @@ class Publisher
         $this->logger = $logger;
         $this->writer = new Io\Writer($logger);
         $this->commentParser = new Doc\Parser();
+        $this->mdParser = new DocParser(Environment::createCommonMarkEnvironment());
     }
 
     /**
@@ -133,6 +141,7 @@ class Publisher
         </axe:layout>;
         $xhp->setContext('job', $job);
         $xhp->setContext('docParser', $this->commentParser);
+        $xhp->setContext('mdParser', $this->mdParser);
         $awaits[] = $this->writer->write($job->getDestination() . DIRECTORY_SEPARATOR . 'namespace-' . str_replace("\\", '_', $namespace) .  ".html", $xhp);
         return $awaits;
     }
@@ -156,6 +165,7 @@ class Publisher
         $xhp->setContext('job', $job);
         $xhp->setContext('scannedClass', $c);
         $xhp->setContext('docParser', $this->commentParser);
+        $xhp->setContext('mdParser', $this->mdParser);
         return $this->writer->write($job->getDestination() . DIRECTORY_SEPARATOR . $this->getFilename($c), $xhp);
     }
 }

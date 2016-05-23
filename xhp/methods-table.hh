@@ -42,6 +42,12 @@ class :hphpdoc:methods-table extends :x:element implements HasXHPHelpers
         if (!($parser instanceof Hphpdoc\Doc\Parser)) {
             $parser = new Hphpdoc\Doc\Parser();
         }
+        $mdParser = $this->getContext('markdownParser');
+        if (!($mdParser instanceof League\CommonMark\DocParser)) {
+            $mdParser = new League\CommonMark\DocParser(
+                League\CommonMark\Environment::createCommonMarkEnvironment()
+            );
+        }
         $membersByVisibility = Map{'Public' => Vector{}, 'Protected' => Vector{}};
         foreach ($methods as $m) {
             if ($m->isPublic()) {
@@ -83,7 +89,7 @@ class :hphpdoc:methods-table extends :x:element implements HasXHPHelpers
                                 <hphpdoc:generics generics={$m->getGenericTypes()}/>
                                 <hphpdoc:parameters params={$m->getParameters()}/>
                                 </div>
-                                <div class="method-summary">{$phpdoc->getSummary()}</div>
+                                <div class="method-summary"><axe:markdown text={$phpdoc->getSummary()} docParser={$mdParser}/></div>
                             </td>
                         </tr>
                     );

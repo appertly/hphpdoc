@@ -42,6 +42,7 @@ class :hphpdoc:method extends :x:element implements HasXHPHelpers
         if (!($parser instanceof Hphpdoc\Doc\Parser)) {
             $parser = new Hphpdoc\Doc\Parser();
         }
+        $mdParser = $this->getMarkdownParser();
         $phpdoc = $parser->parse($m);
         // TODO show method being final
         // TODO show method being async
@@ -67,9 +68,9 @@ class :hphpdoc:method extends :x:element implements HasXHPHelpers
                 <hphpdoc:parameters params={$m->getParameters()}/>
             </div>
             <div class="method-details">
-                <p class="method-summary">{$phpdoc->getSummary()}</p>
+                <div class="method-summary"><axe:markdown text={$phpdoc->getSummary()} docParser={$mdParser}/></div>
                 <div class="method-description">
-                    <axe:paragraphs text={$phpdoc->getDescription()}/>
+                    <axe:markdown text={$phpdoc->getDescription()} docParser={$mdParser}/>
                 </div>
                 <hphpdoc:authorship block={$phpdoc}/>
                 <hphpdoc:versions block={$phpdoc}/>
@@ -86,6 +87,7 @@ class :hphpdoc:method extends :x:element implements HasXHPHelpers
         if ($this->isVoid($method->getReturnType())) {
             return <x:frag />;
         }
+        $mdParser = $this->getMarkdownParser();
         $rt = Vector{$method->getReturnType()};
         $description = '';
         foreach ($block->getTags() as $v) {
@@ -108,7 +110,7 @@ class :hphpdoc:method extends :x:element implements HasXHPHelpers
             <tbody>
                 <tr>
                     <td><hphpdoc:typehints tokens={$rt}/></td>
-                    <td>{$description}</td>
+                    <td><axe:markdown text={$description} docParser={$mdParser}/></td>
                 </tr>
             </tbody>
         </table>;
@@ -119,6 +121,7 @@ class :hphpdoc:method extends :x:element implements HasXHPHelpers
         if (count($method->getParameters()) === 0) {
             return <x:frag />;
         }
+        $mdParser = $this->getMarkdownParser();
         $tbody = <tbody/>;
         foreach ($method->getParameters() as $p) {
             $description = '';
@@ -135,7 +138,7 @@ class :hphpdoc:method extends :x:element implements HasXHPHelpers
                 <tr>
                     <th scope="row"><code class="parameter-name"><var>{"$"}{$p->getName()}</var></code></th>
                     <td><hphpdoc:typehints tokens={$rt}/></td>
-                    <td>{$description}</td>
+                    <td><axe:markdown text={$description} docParser={$mdParser}/></td>
                 </tr>
             );
         }
@@ -154,6 +157,7 @@ class :hphpdoc:method extends :x:element implements HasXHPHelpers
 
     protected function getThrows(ScannedMethod $method, Hphpdoc\Doc\Block $block): XHPRoot
     {
+        $mdParser = $this->getMarkdownParser();
         $tbody = <tbody/>;
         foreach ($block->getTags() as $tag) {
             if ($tag->getName() === 'throws' && $tag instanceof Hphpdoc\Doc\TypedTag) {
@@ -163,7 +167,7 @@ class :hphpdoc:method extends :x:element implements HasXHPHelpers
                             <hphpdoc:typehints tokens={$tag->getTypes()}/>
                         </th>
                         <td>
-                            {$tag->getDescription()}
+                            <axe:markdown text={$tag->getDescription()} docParser={$mdParser}/>
                         </td>
                     </tr>
                 );
@@ -182,5 +186,16 @@ class :hphpdoc:method extends :x:element implements HasXHPHelpers
             </thead>
             {$tbody}
         </table>;
+    }
+
+    protected function getMarkdownParser(): League\CommonMark\DocParser
+    {
+        $mdParser = $this->getContext('markdownParser');
+        if (!($mdParser instanceof League\CommonMark\DocParser)) {
+            $mdParser = new League\CommonMark\DocParser(
+                League\CommonMark\Environment::createCommonMarkEnvironment()
+            );
+        }
+        return $mdParser;
     }
 }

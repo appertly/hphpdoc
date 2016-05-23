@@ -41,6 +41,12 @@ class :hphpdoc:properties-table extends :x:element implements HasXHPHelpers
         if (!($parser instanceof Hphpdoc\Doc\Parser)) {
             $parser = new Hphpdoc\Doc\Parser();
         }
+        $mdParser = $this->getContext('markdownParser');
+        if (!($mdParser instanceof League\CommonMark\DocParser)) {
+            $mdParser = new League\CommonMark\DocParser(
+                League\CommonMark\Environment::createCommonMarkEnvironment()
+            );
+        }
         /* HH_FIXME[1002]: Bug in the typechecker */
         usort($properties, ($a, $b) ==> $a->getName() <=> $b->getName());
         $tbody = <tbody/>;
@@ -85,7 +91,7 @@ class :hphpdoc:properties-table extends :x:element implements HasXHPHelpers
                         <tr>
                             <th scope="row"><code class="property-name"><var><a href={"#property_" . $m->getName()}>${$m->getName()}</a></var></code></th>
                             <td><hphpdoc:typehints tokens={$rt}/></td>
-                            <td><div class="property-summary">{$summary}</div></td>
+                            <td><div class="property-summary"><axe:markdown text={$summary} docParser={$mdParser}/></div></td>
                         </tr>
                     );
                 }

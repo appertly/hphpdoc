@@ -66,6 +66,7 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
             $implements->appendChild(<hphpdoc:typehint token={$v}/>);
         }
 
+        $mdParser = $this->getMarkdownParser();
         $main = <main role="main">
             <header>
                 <ul class="breadcrumb">
@@ -81,10 +82,10 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
                 </h1>
                 {$extends}
                 {$implements}
-                <p class="class-summary">{$block->getSummary()}</p>
+                <div class="class-summary"><axe:markdown text={$block->getSummary()} docParser={$mdParser}/></div>
             </header>
             <div class="class-description">
-                <axe:paragraphs text={$block->getDescription()}/>
+                <axe:markdown text={$block->getDescription()} docParser={$mdParser}/>
             </div>
             <hphpdoc:authorship block={$block}/>
             <hphpdoc:versions block={$block}/>
@@ -200,5 +201,16 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
             $members[$m->getName()] = $m;
         }
         return $members;
+    }
+
+    protected function getMarkdownParser(): League\CommonMark\DocParser
+    {
+        $mdParser = $this->getContext('markdownParser');
+        if (!($mdParser instanceof League\CommonMark\DocParser)) {
+            $mdParser = new League\CommonMark\DocParser(
+                League\CommonMark\Environment::createCommonMarkEnvironment()
+            );
+        }
+        return $mdParser;
     }
 }

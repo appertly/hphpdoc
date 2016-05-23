@@ -43,6 +43,12 @@ class :hphpdoc:classlike-table extends :x:element implements HasXHPHelpers
         if (!($parser instanceof Hphpdoc\Doc\Parser)) {
             $parser = new Hphpdoc\Doc\Parser();
         }
+        $mdParser = $this->getContext('markdownParser');
+        if (!($mdParser instanceof League\CommonMark\DocParser)) {
+            $mdParser = new League\CommonMark\DocParser(
+                League\CommonMark\Environment::createCommonMarkEnvironment()
+            );
+        }
         foreach ($tokens as $c) {
             $block = $parser->parse($c);
             $tb->appendChild(
@@ -51,7 +57,7 @@ class :hphpdoc:classlike-table extends :x:element implements HasXHPHelpers
                         <a class="class-name" href={$this->getFilename($c)}>{$c->getShortName()}</a>
                         <hphpdoc:generics generics={$c->getGenericTypes()}/>
                     </th>
-                    <td>{$block->getSummary()}</td>
+                    <td><axe:markdown text={$block->getSummary()} docParser={$mdParser}/></td>
                 </tr>
             );
         }
