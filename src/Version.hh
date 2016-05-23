@@ -27,5 +27,5 @@ class Version
     /**
      * @var The current version
      */
-    const string VERSION = "0.2.0";
+    const string VERSION = "0.2.x-dev";
 }
