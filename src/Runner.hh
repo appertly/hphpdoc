@@ -91,14 +91,15 @@ class Runner
         $log->debug("Command line options: " . json_encode($options));
 
         try {
-            if ($arguments->isEmpty()) {
-                fwrite(STDERR, "No arguments specified; please specify the files or directories to scan" . PHP_EOL . PHP_EOL);
-                $this->help();
+            if ($options->containsKey('version')) {
+                $this->version();
             } elseif ($options->containsKey('h') || $options->containsKey('help')) {
                 $this->help();
-            } elseif ($options->containsKey('version')) {
-                $this->version();
+            } elseif ($arguments->isEmpty()) {
+                fwrite(STDERR, "No arguments specified; please specify the files or directories to scan" . PHP_EOL . PHP_EOL);
+                $this->help();
             } else {
+                $this->version();
                 $excludes = $this->getExcludes($options);
                 $log->info("Excluding paths: [ " . implode(", ", $excludes) . ' ]');
 
