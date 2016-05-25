@@ -9,11 +9,12 @@
         "fredemmott/definition-finder": "^1.1.0",
         "appertly/cleopatra": "~0.1",
         "appertly/axe": "~0.1",
-        "appertly/axe-markdown": "~0.1"
+        "appertly/axe-markdown": "~0.1",
+        "psr/log": "^1.0.0"
     },
     "require-dev": {
         "hackpack/hackunit": "~0.6",
-        "libreworks/psr3-log-hhi": "~1.0.0"
+        "libreworks/psr3-log-hhi": "^1.0.0"
     },
     "autoload": {
         "psr-4": {
