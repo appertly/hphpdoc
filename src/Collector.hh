@@ -47,69 +47,83 @@ class Collector
      *
      * @param $arguments - The list of files and directories to scan
      * @param $excludes - The list of files and directories to exclude
-     * @return All tokens found
+     * @return - All tokens found
      */
     public function collect(\ConstVector<string> $arguments, \ConstSet<string> $excludes): \ConstVector<ScannedBase>
     {
-        $tokens = $this->getTokens($arguments, $excludes);
-        $rtokens = Vector{};
-        foreach ($tokens as $class) {
-            $omit = false;
-            foreach ($excludes as $exclude) {
-                if (substr($class->getFileName(), 0, strlen($exclude)) === $exclude) {
-                    $omit = true;
-                    /* HH_IGNORE_ERROR[4064]: We set logger in constructor */
-                    $this->logger->debug("Excluding token in file: " . $class->getFileName());
-                    break;
-                }
-            }
-            if (!$omit) {
-                $rtokens[] = $class;
-            }
-        }
-        return $rtokens;
-    }
-
-    /**
-     * Gets all tokens found in the provided files
-     *
-     * @param $arguments - The list of files and directories to scan
-     * @param $excludes - The list of files and directories to exclude
-     * @return The scanned tokens
-     */
-    protected function getTokens(\ConstVector<string> $arguments, \ConstSet<string> $excludes): \ConstVector<ScannedBase>
-    {
+        $log = $this->logger;
+        invariant($log !== null, "Log cannot be null");
         $tokens = Vector{};
         foreach ($arguments as $argument) {
             if ($excludes->contains($argument)) {
-                /* HH_IGNORE_ERROR[4064]: We set logger in constructor */
-                $this->logger->debug("Excluding file: $argument");
+                $log->debug("Excluding file: $argument");
                 continue;
             }
-            $file = new \SplFileInfo($argument);
-            $realPath = $file->isReadable() ? $file->getRealPath() : $argument;
-            if ($file->isReadable()) {
-                /* HH_IGNORE_ERROR[4064]: We set logger in constructor */
-                $this->logger->info("Including path: $realPath");
-                $parser = $file->isDir() ?
-                    TreeParser::FromPath($realPath) :
-                    FileParser::FromFile($realPath);
-                $tokens->addAll($parser->getClasses());
-                $tokens->addAll($parser->getInterfaces());
-                $tokens->addAll($parser->getTraits());
-                $tokens->addAll($parser->getFunctions());
-                $tokens->addAll($parser->getConstants());
-                $tokens->addAll($parser->getEnums());
-                $tokens->addAll($parser->getTypes());
-                $tokens->addAll($parser->getNewtypes());
-            } else {
-                /* HH_IGNORE_ERROR[4064]: We set logger in constructor */
-                $this->logger->warning("File not readable: $realPath");
+            foreach ($this->parsePath($argument, $log) as $token) {
+                $omit = false;
+                foreach ($excludes as $exclude) {
+                    if (substr($token->getFileName(), 0, strlen($exclude)) === $exclude) {
+                        $omit = true;
+                        $log->debug("Excluding token in file: " . $token->getFileName());
+                        break;
+                    }
+                }
+                if (!$omit) {
+                    $tokens[] = $token;
+                }
             }
         }
         // https://github.com/facebook/hhvm/issues/7037
         /* HH_IGNORE_ERROR[1002]: Bug in the type checker! */
         usort($tokens, ($a, $b) ==> $a->getName() <=> $b->getName());
+        return $tokens;
+    }
+
+    protected function parsePath(string $argument, LoggerInterface $log): \ConstVector<ScannedBase>
+    {
+        $file = new \SplFileInfo($argument);
+        $realPath = $file->isReadable() ? $file->getRealPath() : $argument;
+        $tokens = Vector{};
+        if ($file->isReadable()) {
+            $log->info("Including path: $realPath");
+            $parser = $file->isDir() ?
+                TreeParser::FromPath($realPath) :
+                FileParser::FromFile($realPath);
+
+            $constants = $parser->getConstants();
+            $log->info("Found " . count($constants) . " constants");
+            $tokens->addAll($constants);
+
+            $functions = $parser->getFunctions();
+            $log->info("Found " . count($functions) . " functions");
+            $tokens->addAll($functions);
+
+            $interfaces = $parser->getInterfaces();
+            $log->info("Found " . count($interfaces) . " interfaces");
+            $tokens->addAll($interfaces);
+
+            $traits = $parser->getTraits();
+            $log->info("Found " . count($traits) . " traits");
+            $tokens->addAll($traits);
+
+            $classes = $parser->getClasses();
+            $log->info("Found " . count($classes) . " classes");
+            $tokens->addAll($classes);
+
+            $enums = $parser->getEnums();
+            $log->info("Found " . count($enums) . " enums");
+            $tokens->addAll($enums);
+
+            $types = $parser->getTypes();
+            $log->info("Found " . count($types) . " types");
+            $tokens->addAll($types);
+
+            $newtypes = $parser->getNewtypes();
+            $log->info("Found " . count($types) . " newtypes");
+            $tokens->addAll($newtypes);
+        } else {
+            $log->warning("File not readable: $realPath");
+        }
         return $tokens;
     }
 }

@@ -15,7 +15,7 @@
  * the License.
  *
  * @copyright 2016 Appertly
- * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
+ * @license   Apache-2.0
  */
 
 /**
@@ -29,6 +29,8 @@ class :hphpdoc:typehint extends :x:element implements HasXHPHelpers
     category %flow, %phrase;
     children empty;
     attribute :xhp:html-element,
+        bool returnType = false,
+        ?bool nullable = null,
         ?FredEmmott\DefinitionFinder\ScannedTypehint token @required;
 
     protected function render(): XHPRoot
@@ -36,37 +38,40 @@ class :hphpdoc:typehint extends :x:element implements HasXHPHelpers
         $type = $this->:token;
         $job = $this->getContext('job');
         $tbn = $job instanceof Hphpdoc\Job ? $job->getTokensByName() : Map{};
-        $sc = $this->getContext('scannedClass');
-
+        $cd = $this->getContext('classyDeclaration');
         $tag = <span class="typehint"/>;
         if ($this->isVoid($type)) {
-            $tag->appendChild(<code class="void">void</code>);
+            $tag->appendChild($this->:returnType ?
+                <code class="void">void</code> : <code class="primitive">mixed</code>);
             return $tag;
         }
         invariant($type !== null, "Typehint is null");
         $base = $type->getTypeName();
-        if ($type->isNullable()) {
+        if ($type->isNullable() || $this->:nullable === true && $base !== 'mixed') {
             $tag->appendChild(<code class="nullable" title="Nullable">?</code>);
         }
 
         if ($this->isPrimitive($base) || $base === 'tuple') {
             $tag->appendChild(<code class="primitive">{$base}</code>);
         } elseif ($this->isThisy($type)) {
-            $tag->appendChild(<code class="ref"><a href="#">{$base}</a></code>);
+            $tag->appendChild(<code class="ref"><a href="#">{$this->abbrClass($base)}</a></code>);
         } elseif (substr($base, 0, 1) == '\\') {
             if ($tbn->containsKey(substr($base, 1))) {
-                $tag->appendChild(<code class="ref"><a href={$this->getFilename($tbn[substr($base, 1)])}>{substr($base, 1)}</a></code>);
+                $tag->appendChild(<code class="ref"><a href={$this->getFilename($tbn[substr($base, 1)])}>{$this->abbrClass(substr($base, 1))}</a></code>);
             } else {
-                $tag->appendChild(<code class="ref">{substr($base, 1)}</code>);
+                $tag->appendChild(<code class="ref">{$this->abbrClass(substr($base, 1))}</code>);
             }
-        } elseif ($sc instanceof FredEmmott\DefinitionFinder\ScannedClass) {
+        } elseif ($cd instanceof Hphpdoc\Source\ClassyDeclaration) {
+            $sc = $cd->getToken();
             $gens = $sc->getGenericTypes()->map($a ==> $a->getName());
-            if ($tbn->containsKey($sc->getNamespaceName() . '\\' . $base)) {
-                $tag->appendChild(<code class="ref"><a href={$this->getFilename($tbn[$sc->getNamespaceName() . '\\' . $base])}>{$base}</a></code>);
-            } elseif ($gens->linearSearch($base) > -1) {
+            if ($gens->linearSearch($base) > -1) {
                 $tag->appendChild(<code class="generic-ref"><var>{$base}</var></code>);
+            } elseif ($tbn->containsKey($sc->getNamespaceName() . '\\' . $base)) {
+                $tag->appendChild(<code class="ref"><a href={$this->getFilename($tbn[$sc->getNamespaceName() . '\\' . $base])}>{$this->abbrClass($base)}</a></code>);
+            } elseif ($tbn->containsKey($base)) {
+                $tag->appendChild(<code class="ref"><a href={$this->getFilename($tbn[$base])}>{$this->abbrClass($base)}</a></code>);
             } else {
-                $tag->appendChild(<code class="ref">{$base}</code>);
+                $tag->appendChild(<code class="ref">{$this->abbrClass($base)}</code>);
             }
         } else {
             $tag->appendChild(<code class="ref">{$base}</code>);
@@ -96,5 +101,11 @@ class :hphpdoc:typehint extends :x:element implements HasXHPHelpers
         }
 
         return $tag;
+    }
+
+    private function abbrClass(string $name): XHPChild
+    {
+        return strpos($name, '\\') !== false ?
+            <abbr title={$name}>{substr(strrchr($name, '\\'), 1)}</abbr> : $name;
     }
 }

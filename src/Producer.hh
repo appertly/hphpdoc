@@ -24,8 +24,10 @@ use FredEmmott\DefinitionFinder\ScannedBase;
 use FredEmmott\DefinitionFinder\ScannedClass;
 use FredEmmott\DefinitionFinder\ScannedEnum;
 use FredEmmott\DefinitionFinder\ScannedMethod;
+use FredEmmott\DefinitionFinder\ScannedNewtype;
 use FredEmmott\DefinitionFinder\ScannedProperty;
 use FredEmmott\DefinitionFinder\ScannedTypehint;
+use FredEmmott\DefinitionFinder\ScannedType;
 
 /**
  * Contains helper methods for anything which generates content.
@@ -42,7 +44,7 @@ trait Producer
      * Gets whether the provided type is primitive.
      *
      * @param $type - The type to test
-     * @return true if the type is primitive.
+     * @return - `true` if the type is primitive.
      */
     protected function isPrimitive(string $type): bool
     {
@@ -53,7 +55,7 @@ trait Producer
      * Gets whether the provided typehint is void.
      *
      * @param $type - The typehint to test
-     * @return true if the typehint is void
+     * @return - `true` if the typehint is void
      */
     protected function isVoid(?ScannedTypehint $type): bool
     {
@@ -64,7 +66,7 @@ trait Producer
      * Gets whether the provided typehint refers to `$this`
      *
      * @param $type - The typehint to test
-     * @return true if the typehint is *thisy*
+     * @return - `true` if the typehint is *thisy*
      */
     protected function isThisy(?ScannedTypehint $type): bool
     {
@@ -74,7 +76,8 @@ trait Producer
     /**
      * Gets a page builder.
      *
-     * @return The page builder
+     * @param $title - The page title
+     * @return - The page builder
      */
     protected function getPage(string $title): Page
     {
@@ -88,12 +91,15 @@ trait Producer
      * Cleans up a filename.
      *
      * @param $c - The scanned token
-     * @return The cleaned up filename
+     * @return - The cleaned up filename
      */
     protected function getFilename(ScannedBase $c): string
     {
         if ($c instanceof ScannedClass || $c instanceof ScannedEnum) {
             return str_replace("\\", '_', $c->getName()) . '.html';
+        } elseif ($c instanceof ScannedType || $c instanceof ScannedNewtype) {
+            // TODO
+            return 'todo.html';
         }
         throw new \InvalidArgumentException("Cannot generate a filename for this scanned token");
     }

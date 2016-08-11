@@ -25,9 +25,6 @@ use Cleopatra\Option;
 use Cleopatra\Parser;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use FredEmmott\DefinitionFinder\FileParser;
-use FredEmmott\DefinitionFinder\TreeParser;
-use FredEmmott\DefinitionFinder\ScannedBase;
 
 /**
  * Runs the generator
@@ -102,24 +99,12 @@ class Runner
                 $this->version();
                 $excludes = $this->getExcludes($options);
                 $log->info("Excluding paths: [ " . implode(", ", $excludes) . ' ]');
-
                 $collector = new Collector($log);
-                $tokens = $collector->collect($arguments, $excludes);
-                $tokensByType = Map{};
-                foreach ($tokens as $token) {
-                    $c = substr(get_class($token), 28);
-                    if (!$tokensByType->containsKey($c)) {
-                        $tokensByType[$c] = 0;
-                    }
-                    $tokensByType[$c]++;
-                }
-                foreach ($tokensByType as $type => $count) {
-                    $log->info("Found $count " . substr($type, 7) . "s");
-                }
-
-                $destination = (string)($options->get('o') ?? $options->get('output') ?? getcwd());
                 $publisher = new Publisher($log);
-                $publisher->publish($destination, $tokens);
+                $publisher->publish(
+                    (string)($options->get('o') ?? $options->get('output') ?? getcwd()),
+                    $collector->collect($arguments, $excludes),
+                );
             }
         } catch (\Exception $e) {
             $log->error($e->getMessage());

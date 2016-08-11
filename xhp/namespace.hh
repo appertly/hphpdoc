@@ -15,13 +15,16 @@
  * the License.
  *
  * @copyright 2016 Appertly
- * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
+ * @license   Apache-2.0
  */
 
-use FredEmmott\DefinitionFinder\ScannedBase;
 use FredEmmott\DefinitionFinder\ScannedBasicClass;
+use FredEmmott\DefinitionFinder\ScannedConstant;
 use FredEmmott\DefinitionFinder\ScannedTrait;
 use FredEmmott\DefinitionFinder\ScannedInterface;
+use FredEmmott\DefinitionFinder\ScannedFunction;
+use Hphpdoc\Source\TokenDeclaration;
+use Hphpdoc\Job;
 
 /**
  * Renders a namespace page
@@ -32,15 +35,16 @@ class :hphpdoc:namespace extends :x:element implements HasXHPHelpers
 
     category %flow;
     children empty;
-    attribute :xhp:html-element,
+    attribute :main,
         string namespace @required,
-        Traversable<ScannedBase> tokens @required,
-        ConstMap<string,Vector<ScannedBase>> tokensByName @required;
+        Traversable<TokenDeclaration> declarations @required,
+        ConstSet<string> namespaces @required;
 
     protected function render(): XHPRoot
     {
         $namespace = $this->:namespace;
-        $tokens = new Vector($this->:tokens);
+        $namespaces = $this->:namespaces;
+        $declarations = new Vector($this->:declarations);
         $breadcrumbs = <x:frag/>;
         if (strpos($namespace, '\\') !== false) {
             $breadcrumbs = <ul class="breadcrumb">
@@ -53,13 +57,6 @@ class :hphpdoc:namespace extends :x:element implements HasXHPHelpers
                 <h1>Namespace {$namespace}</h1>
             </header>
         </main>;
-        $namespaces = new Map($this->:tokensByName);
-        $namespaces = $namespaces->filterWithKey(function ($k, $v) use ($namespace) {
-            $ns = substr($k, 0, strrpos($k, "\\"));
-            return substr($ns, 0, strlen($namespace) + 1) === "$namespace\\";
-        });
-        ksort($namespaces);
-        $namespaces = $namespaces->keys()->map($k ==> substr($k, 0, strrpos($k, "\\")))->toSet();
         if (count($namespaces) > 0) {
             $main->appendChild(<section>
                 <header>
@@ -68,12 +65,20 @@ class :hphpdoc:namespace extends :x:element implements HasXHPHelpers
                 <hphpdoc:namespaces-list namespaces={$namespaces}/>
             </section>);
         }
+
+        $job = $this->getContext('job');
+        invariant($job instanceof Job, "job context value must be a Job");
+
         /* HH_IGNORE_ERROR[4110]: Generic type is fine */
-        $main->appendChild(<hphpdoc:classlike-table title="Interfaces" tokens={$tokens->filter($a ==> $a instanceof ScannedInterface)}/>);
+        $main->appendChild(<hphpdoc:classlike-table title="Interfaces" tokens={$declarations->filter($a ==> $a->getToken() instanceof ScannedInterface)}/>);
         /* HH_IGNORE_ERROR[4110]: Generic type is fine */
-        $main->appendChild(<hphpdoc:classlike-table title="Traits" tokens={$tokens->filter($a ==> $a instanceof ScannedTrait)}/>);
+        $main->appendChild(<hphpdoc:classlike-table title="Traits" tokens={$declarations->filter($a ==> $a->getToken() instanceof ScannedTrait)}/>);
         /* HH_IGNORE_ERROR[4110]: Generic type is fine */
-        $main->appendChild(<hphpdoc:classlike-table title="Classes" tokens={$tokens->filter($a ==> $a instanceof ScannedBasicClass)}/>);
+        $main->appendChild(<hphpdoc:classlike-table title="Classes" tokens={$declarations->filter($a ==> $a->getToken() instanceof ScannedBasicClass)}/>);
+        /* HH_IGNORE_ERROR[4110]: Generic type is fine */
+        $main->appendChild(<hphpdoc:constants-table title="Constants" constants={$declarations->filter($a ==> $a->getToken() instanceof ScannedConstant)}/>);
+        /* HH_IGNORE_ERROR[4110]: Generic type is fine */
+        $main->appendChild(<hphpdoc:functions-table title="Functions" functions={$declarations->filter($a ==> $a->getToken() instanceof ScannedFunction)}/>);
         return $main;
     }
 }

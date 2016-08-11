@@ -17,11 +17,28 @@
  * @copyright 2016 Appertly
  * @license   Apache-2.0
  */
-namespace Hphpdoc\Io;
+
+use League\CommonMark\DocParser;
+use League\CommonMark\Environment;
 
 /**
- * Exception for I/O operations.
+ * Helper to be used by XHP that needs the Markdown parser.
  */
-class IoException extends \RuntimeException
+trait MarkdownHelper
 {
+    require implements XHPRoot;
+
+    /**
+     * Gets the Markdown parser
+     *
+     * @return - The Markdown parser
+     */
+    protected function getMarkdownParser(): DocParser
+    {
+        $mdParser = $this->getContext('markdownParser');
+        if (!($mdParser instanceof DocParser)) {
+            $mdParser = new DocParser(Environment::createCommonMarkEnvironment());
+        }
+        return $mdParser;
+    }
 }

@@ -25,7 +25,7 @@ namespace Hphpdoc;
 class Version
 {
     /**
-     * @var The current version
+     * The current version
      */
     const string VERSION = "0.2.x-dev";
 }

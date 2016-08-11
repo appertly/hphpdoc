@@ -15,10 +15,10 @@
  * the License.
  *
  * @copyright 2016 Appertly
- * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
+ * @license   Apache-2.0
  */
 
-use FredEmmott\DefinitionFinder\ScannedConstant;
+use Hphpdoc\Source\ConstantDeclaration;
 
 /**
  * Renders a constant.
@@ -27,53 +27,44 @@ class :hphpdoc:constant extends :x:element implements HasXHPHelpers
 {
     use XHPHelpers;
     use Hphpdoc\Producer;
+    use MarkdownHelper;
 
     category %flow, %sectioning;
     children empty;
     attribute :xhp:html-element,
-        ScannedConstant constant @required;
+        ConstantDeclaration constant @required;
 
     protected function render(): XHPRoot
     {
         $m = $this->:constant;
-        $sc = $this->getContext('scannedClass');
-        invariant($sc instanceof \FredEmmott\DefinitionFinder\ScannedBase, "scannedClass context value must be a ScannedBase");
-        $parser = $this->getContext('docParser');
-        if (!($parser instanceof Hphpdoc\Doc\Parser)) {
-            $parser = new Hphpdoc\Doc\Parser();
-        }
-        $mdParser = $this->getContext('markdownParser');
-        if (!($mdParser instanceof League\CommonMark\DocParser)) {
-            $mdParser = new League\CommonMark\DocParser(
-                League\CommonMark\Environment::createCommonMarkEnvironment()
+        $mdParser = $this->getMarkdownParser();
+        $phpdoc = $m->getDocBlock();
+        $summary = $m->getSummary();
+        $rt = $m->getType();
+        $inherit = null;
+        $cd = $this->getContext('classyDeclaration');
+        $labels = <p class="constant-labels"/>;
+        $mclass = $m->getClass();
+        if ($mclass !== null && $cd instanceof Hphpdoc\Source\ClassyDeclaration
+                && $mclass->getName() !== $cd->getName()) {
+            $labels->appendChild(
+                <span class="label">Inherited from {$this->abbrClass($mclass->getName())}</span>
             );
         }
-        $phpdoc = $parser->parse($m);
-        $summary = trim($phpdoc->getSummary());
-        $rt = Vector{$m->getTypehint()};
-        foreach ($phpdoc->getTags() as $t) {
-            if ($t->getName() === 'var' && $t instanceof Hphpdoc\Doc\TypedTag) {
-                if ($rt[0] === null || $rt[0]?->getTypeName() === 'mixed') {
-                    $rt = $t->getTypes();
-                }
-                if (strlen($summary) === 0) {
-                    $summary = $t->getDescription();
-                }
-                break;
-            }
-        }
-        return <section id={"constant_" . $m->getName()} class="constant-section">
+        return <section id={"constant_" . $m->getToken()->getShortName()} class="constant-section">
             <header>
-                <h1>{$m->getName()}</h1>
+                <h1>{$m->getToken()->getShortName()}</h1>
+                {$labels}
             </header>
             <div class="constant-signature">
+                {"const "}
                 <code class="constant-type">
-                    <hphpdoc:typehints tokens={$rt}/>
+                    <hphpdoc:typehint token={$rt}/>
                 </code>
                 {" "}
-                <code class="constant-name">{$m->getName()}</code>
+                <code class="constant-name">{$m->getToken()->getShortName()}</code>
                 <code class="separator-constant">{" = "}</code>
-                <code class="constant-value">{$m->getValue()}</code>
+                <code class="constant-value">{$m->getToken()->getValue()}</code>
             </div>
             <div class="constant-details">
                 <div class="constant-summary"><axe:markdown text={$summary} docParser={$mdParser}/></div>
@@ -85,5 +76,11 @@ class :hphpdoc:constant extends :x:element implements HasXHPHelpers
                 <hphpdoc:links block={$phpdoc}/>
             </div>
         </section>;
+    }
+
+    private function abbrClass(string $name): XHPChild
+    {
+        return strpos($name, '\\') !== false ?
+            <abbr title={$name}>{substr(strrchr($name, '\\'), 1)}</abbr> : $name;
     }
 }

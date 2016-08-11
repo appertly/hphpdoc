@@ -17,11 +17,26 @@
  * @copyright 2016 Appertly
  * @license   Apache-2.0
  */
-namespace Hphpdoc\Io;
+namespace Hphpdoc\Source;
+
+use FredEmmott\DefinitionFinder\ScannedBase;
 
 /**
- * Exception for I/O operations.
+ * A thing and its corresponding doc block
  */
-class IoException extends \RuntimeException
+interface TokenDeclaration<T as ScannedBase> extends Declaration
 {
+    /**
+     * Gets the name of the declaration.
+     *
+     * @return - The declaration name
+     */
+    public function getName(): string;
+
+    /**
+     * Gets the scanned token.
+     *
+     * @return - The scanned token
+     */
+    public function getToken(): T;
 }

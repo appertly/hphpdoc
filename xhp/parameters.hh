@@ -15,8 +15,10 @@
  * the License.
  *
  * @copyright 2016 Appertly
- * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
+ * @license   Apache-2.0
  */
+
+use FredEmmott\DefinitionFinder\ScannedFunctionAbstract;
 
 /**
  * Renders method parameters.
@@ -28,18 +30,29 @@ class :hphpdoc:parameters extends :x:element implements HasXHPHelpers
     category %flow, %phrase;
     children empty;
     attribute :xhp:html-element,
-        ConstVector<FredEmmott\DefinitionFinder\ScannedParameter> params @required;
+        Hphpdoc\Source\FunctionyDeclaration member @required;
 
     protected function render(): XHPRoot
     {
+        $function = $this->:member;
         $tag = <span class="method-parameters"/>;
         $tag->appendChild(<span class="separator-parameter">{"("}</span>);
-        foreach ($this->:params as $k => $param) {
-            if ($k > 0) {
+        $tags = $function->getParameterTags();
+        $params = $function->getToken()->getParameters();
+        foreach ($params as $i => $param) {
+            $rt = Vector{$param->getTypehint()};
+            $t = $tags[$param->getName()];
+            $description = $t->getDescription();
+            if ($rt[0] === null || $rt[0]?->getTypeName() === 'mixed') {
+                $rt = $t->getTypes();
+            }
+            if ($i > 0) {
                 $tag->appendChild(<span class="separator-parameter">{", "}</span>);
             }
             $p = <code class="parameter"/>;
-            $p->appendChild(<hphpdoc:typehint token={$param->getTypehint()}/>);
+            $nullable = $param->isOptional() && $param->getDefaultString() === 'null' ? true : null;
+            $typehint = count($rt) > 1 ? $param->getTypehint() : ($rt[0] ?? null);
+            $p->appendChild(<hphpdoc:typehint token={$typehint} nullable={$nullable}/>);
             if ($param->isVariadic()) {
                 $p->appendChild(<span class="variadic">...</span>);
             }

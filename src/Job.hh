@@ -26,21 +26,14 @@ use FredEmmott\DefinitionFinder\ScannedBase;
  */
 class Job
 {
-    private ImmMap<string,ScannedBase> $tokens;
-
     /**
      * Creates a new Job.
      *
      * @param $destination - The file path to contain exported pages
-     * @param $tokens - All scanned tokens
+     * @param $mapper - The mapper
      */
-    public function __construct(private string $destination, \ConstVector<ScannedBase> $tokens)
+    public function __construct(private string $destination, private Source\Mapper $mapper)
     {
-        $tm = Map{};
-        foreach ($tokens as $t) {
-            $tm[$t->getName()] = $t;
-        }
-        $this->tokens = $tm->immutable();
     }
 
     /**
@@ -54,13 +47,23 @@ class Job
     }
 
     /**
+     * Gets the Mapper
+     *
+     * @return - The mapper
+     */
+    public function getMapper(): Source\Mapper
+    {
+        return $this->mapper;
+    }
+
+    /**
      * Gets the tokens, keyed by name
      *
      * @return - The scanned tokens, keyed by name
      */
-    public function getTokensByName(): ImmMap<string,ScannedBase>
+    public function getTokensByName(): \ConstMap<string,ScannedBase>
     {
-        return $this->tokens;
+        return $this->mapper->getTokensByName();
     }
 
     /**
@@ -68,12 +71,9 @@ class Job
      *
      * @return - The token namespaces
      */
-    <<__Memoize>>
-    public function getNamespaces(): ImmSet<string>
+    public function getNamespaces(): \ConstSet<string>
     {
-        $namespaces = $this->tokens->values()->map($a ==> $a->getNamespaceName())->toVector();
-        sort($namespaces);
-        return $namespaces->toImmSet();
+        return $this->mapper->getNamespaces();
     }
 
     /**
@@ -81,9 +81,8 @@ class Job
      *
      * @return - The scanned tokens
      */
-    <<__Memoize>>
-    public function getTokens(): ImmVector<ScannedBase>
+    public function getTokens(): \ConstVector<ScannedBase>
     {
-        return $this->tokens->values()->immutable();
+        return $this->mapper->getTokens();
     }
 }

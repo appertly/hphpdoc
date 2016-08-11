@@ -17,11 +17,38 @@
  * @copyright 2016 Appertly
  * @license   Apache-2.0
  */
-namespace Hphpdoc\Io;
+namespace Hphpdoc\Source;
+
+use Hphpdoc\Doc\Block;
 
 /**
- * Exception for I/O operations.
+ * A declared file.
  */
-class IoException extends \RuntimeException
+class FileDeclaration implements Declaration
 {
+    /**
+     * Creates a new FileDeclaration.
+     *
+     * @param $filename - The filename
+     * @param $block - The doc comment
+     */
+    public function __construct(private string $filename, private Block $block)
+    {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFilename(): string
+    {
+        return $this->filename;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDocBlock(): Block
+    {
+        return $this->block;
+    }
 }

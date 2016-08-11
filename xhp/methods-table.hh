@@ -15,7 +15,7 @@
  * the License.
  *
  * @copyright 2016 Appertly
- * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
+ * @license   Apache-2.0
  */
 
 /**
@@ -25,12 +25,13 @@ class :hphpdoc:methods-table extends :x:element implements HasXHPHelpers
 {
     use XHPHelpers;
     use Hphpdoc\Producer;
+    use MarkdownHelper;
 
     category %flow, %sectioning;
     children empty;
     attribute :section,
         Stringish title @required,
-        ConstVector<FredEmmott\DefinitionFinder\ScannedMethod> methods @required;
+        ConstVector<Hphpdoc\Source\MethodDeclaration> methods @required;
 
     protected function render(): XHPRoot
     {
@@ -38,21 +39,12 @@ class :hphpdoc:methods-table extends :x:element implements HasXHPHelpers
         if (count($methods) === 0) {
             return <x:frag/>;
         }
-        $parser = $this->getContext('docParser');
-        if (!($parser instanceof Hphpdoc\Doc\Parser)) {
-            $parser = new Hphpdoc\Doc\Parser();
-        }
-        $mdParser = $this->getContext('markdownParser');
-        if (!($mdParser instanceof League\CommonMark\DocParser)) {
-            $mdParser = new League\CommonMark\DocParser(
-                League\CommonMark\Environment::createCommonMarkEnvironment()
-            );
-        }
+        $mdParser = $this->getMarkdownParser();
         $membersByVisibility = Map{'Public' => Vector{}, 'Protected' => Vector{}};
         foreach ($methods as $m) {
-            if ($m->isPublic()) {
+            if ($m->getToken()->isPublic()) {
                 $membersByVisibility['Public'][] = $m;
-            } elseif ($m->isProtected()) {
+            } elseif ($m->getToken()->isProtected()) {
                 $membersByVisibility['Protected'][] = $m;
             }
         }
@@ -60,9 +52,11 @@ class :hphpdoc:methods-table extends :x:element implements HasXHPHelpers
             count($membersByVisibility['Protected']) === 0) {
             return <x:frag/>;
         }
+        $title = $this->:title;
+        $this->removeAttribute('title');
         $methodSection = <section class="methods-index">
             <header>
-                <h1>{$this->:title}</h1>
+                <h1>{$title}</h1>
             </header>
         </section>;
         foreach ($membersByVisibility as $vis => $methods) {
@@ -71,23 +65,23 @@ class :hphpdoc:methods-table extends :x:element implements HasXHPHelpers
                 usort($methods, ($a, $b) ==> $a->getName() <=> $b->getName());
                 $tbody = <tbody/>;
                 foreach ($methods as $m) {
-                    $phpdoc = $parser->parse($m);
-                    $rt = Vector{$m->getReturnType()};
+                    $phpdoc = $m->getDocBlock();
+                    $rt = Vector{$m->getToken()->getReturnType()};
                     if ($rt[0] === null || $rt[0]?->getTypeName() === 'mixed') {
-                        foreach ($phpdoc->getTags() as $t) {
-                            if ($t->getName() === 'return' && $t instanceof Hphpdoc\Doc\TypedTag) {
-                                $rt = $t->getTypes();
-                            }
+                        $ret = $m->getReturnsTag();
+                        if ($ret !== null) {
+                            $rt = $ret->getTypes();
                         }
                     }
+                    /* HH_IGNORE_ERROR[4101]: Yup */
                     $tbody->appendChild(
                         <tr>
-                            <td><hphpdoc:typehints tokens={$rt}/></td>
+                            <td><hphpdoc:typehints tokens={$rt} returnType={true}/></td>
                             <td>
                                 <div class="method-signature">
-                                <code class="method-name"><a href={"#method_" . $m->getName()}>{$m->getName()}</a></code>
-                                <hphpdoc:generics generics={$m->getGenericTypes()}/>
-                                <hphpdoc:parameters params={$m->getParameters()}/>
+                                    <code class="method-name"><a href={"#method_" . $m->getName()}>{$m->getName()}</a></code>
+                                    <hphpdoc:generics generics={$m->getToken()->getGenericTypes()}/>
+                                    <hphpdoc:parameters member={$m}/>
                                 </div>
                                 <div class="method-summary"><axe:markdown text={$phpdoc->getSummary()} docParser={$mdParser}/></div>
                             </td>

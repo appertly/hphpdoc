@@ -15,10 +15,10 @@
  * the License.
  *
  * @copyright 2016 Appertly
- * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
+ * @license   Apache-2.0
  */
 
-use FredEmmott\DefinitionFinder\ScannedProperty;
+use Hphpdoc\Source\PropertyDeclaration;
 
 /**
  * Renders a property.
@@ -27,54 +27,44 @@ class :hphpdoc:property extends :x:element implements HasXHPHelpers
 {
     use XHPHelpers;
     use Hphpdoc\Producer;
+    use MarkdownHelper;
 
     category %flow, %sectioning;
     children empty;
     attribute :section,
-        ScannedProperty property @required;
+        PropertyDeclaration property @required;
 
     protected function render(): XHPRoot
     {
         $m = $this->:property;
-        $sc = $this->getContext('scannedClass');
-        invariant($sc instanceof \FredEmmott\DefinitionFinder\ScannedBase, "scannedClass context value must be a ScannedBase");
-        $parser = $this->getContext('docParser');
-        if (!($parser instanceof Hphpdoc\Doc\Parser)) {
-            $parser = new Hphpdoc\Doc\Parser();
-        }
-        $mdParser = $this->getContext('markdownParser');
-        if (!($mdParser instanceof League\CommonMark\DocParser)) {
-            $mdParser = new League\CommonMark\DocParser(
-                League\CommonMark\Environment::createCommonMarkEnvironment()
+        $token = $m->getToken();
+        $name = $token->getName();
+        $cd = $this->getContext('classyDeclaration');
+        invariant($cd instanceof Hphpdoc\Source\ClassyDeclaration, "classyDeclaration context value must be a ClassyDeclaration");
+        $mdParser = $this->getMarkdownParser();
+        $phpdoc = $m->getDocBlock();
+        $summary = $m->getSummary();
+        $rt = $m->getTypes();
+        $labels = <p class="method-labels"/>;
+        if ($cd->getName() !== $m->getClass()->getName()) {
+            $labels->appendChild(
+                <span class="label">Inherited from {$this->abbrClass($m->getClass()->getName())}</span>
             );
         }
-        $phpdoc = $parser->parse($m);
-        $summary = trim($phpdoc->getSummary());
-        $rt = Vector{$m->getTypehint()};
-        foreach ($phpdoc->getTags() as $t) {
-            if ($t->getName() === 'var' && $t instanceof Hphpdoc\Doc\TypedTag) {
-                if ($rt[0] === null || $rt[0]?->getTypeName() === 'mixed') {
-                    $rt = $t->getTypes();
-                }
-                if (strlen($summary) === 0) {
-                    $summary = $t->getDescription();
-                }
-                break;
-            }
-        }
-        return <section id={"property_" . $m->getName()} class="property-section">
+        return <section id={"property_$name"} class="property-section">
             <header>
-                <h1>${$m->getName()}</h1>
+                <h1>${$name}</h1>
+                {$labels}
             </header>
             <div class="property-signature">
-                {$m->isStatic() ? 'static ' : ''}
-                {$m->isPublic() ? 'public ' : ''}
-                {$m->isProtected() ? 'protected ' : ''}
+                {$token->isStatic() ? 'static ' : ''}
+                {$token->isPublic() ? 'public ' : ''}
+                {$token->isProtected() ? 'protected ' : ''}
                 <code class="property-type">
                     <hphpdoc:typehints tokens={$rt}/>
                 </code>
                 {" "}
-                <code class="property-name"><var>${$m->getName()}</var></code>
+                <code class="property-name"><var>${$name}</var></code>
             </div>
             <div class="property-details">
                 <div class="property-summary"><axe:markdown text={$summary} docParser={$mdParser}/></div>
@@ -86,5 +76,11 @@ class :hphpdoc:property extends :x:element implements HasXHPHelpers
                 <hphpdoc:links block={$phpdoc}/>
             </div>
         </section>;
+    }
+
+    private function abbrClass(string $name): XHPChild
+    {
+        return strpos($name, '\\') !== false ?
+            <abbr title={$name}>{substr(strrchr($name, '\\'), 1)}</abbr> : $name;
     }
 }

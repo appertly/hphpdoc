@@ -15,7 +15,7 @@
  * the License.
  *
  * @copyright 2016 Appertly
- * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
+ * @license   Apache-2.0
  */
 
 /**
@@ -28,7 +28,8 @@ class :hphpdoc:typehints extends :x:element implements HasXHPHelpers
     category %flow, %phrase;
     children empty;
     attribute :xhp:html-element,
-        \ConstVector<?FredEmmott\DefinitionFinder\ScannedTypehint> tokens @required;
+        bool returnType = false,
+        ConstVector<?FredEmmott\DefinitionFinder\ScannedTypehint> tokens @required;
 
     protected function render(): XHPRoot
     {
@@ -37,7 +38,7 @@ class :hphpdoc:typehints extends :x:element implements HasXHPHelpers
             if ($i > 0) {
                 $c->appendChild(<span class="typehint-separator">{" | "}</span>);
             }
-            $c->appendChild(<hphpdoc:typehint token={$t}/>);
+            $c->appendChild(<hphpdoc:typehint token={$t} returnType={$this->:returnType}/>);
         }
         return $c;
     }

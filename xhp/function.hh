@@ -18,12 +18,14 @@
  * @license   Apache-2.0
  */
 
-use Hphpdoc\Source\MethodDeclaration;
+use FredEmmott\DefinitionFinder\ScannedFunctionAbstract;
+use Hphpdoc\Source\FunctionDeclaration;
+use Hphpdoc\Source\FunctionyDeclaration;
 
 /**
- * Renders a method.
+ * Renders a function.
  */
-class :hphpdoc:method extends :x:element implements HasXHPHelpers
+class :hphpdoc:function extends :x:element implements HasXHPHelpers
 {
     use XHPHelpers;
     use MarkdownHelper;
@@ -32,34 +34,22 @@ class :hphpdoc:method extends :x:element implements HasXHPHelpers
     category %flow, %sectioning;
     children empty;
     attribute :section,
-        MethodDeclaration method @required;
+        FunctionDeclaration function @required;
 
     protected function render(): XHPRoot
     {
-        $m = $this->:method;
+        $m = $this->:function;
         $token = $m->getToken();
-        $name = $token->getName();
-        $cd = $this->getContext('classyDeclaration');
-        invariant($cd instanceof Hphpdoc\Source\ClassyDeclaration, "classyDeclaration context value must be a ClassyDeclaration");
+        $name = $token->getShortName();
         $mdParser = $this->getMarkdownParser();
         $phpdoc = $m->getDocBlock();
-        // TODO show method being final
-        // TODO show method being abstract
         $labels = <p class="method-labels"/>;
-        if ($cd->getName() !== $m->getClass()->getName()) {
-            $labels->appendChild(
-                <span class="label">Inherited from {$this->abbrClass($m->getClass()->getName())}</span>
-            );
-        }
-        return <section id={"method_$name"} class="method-section">
+        return <section id={"function_$name"} class="method-section">
             <header>
                 <h1>{$name}</h1>
                 {$labels}
             </header>
             <div class="method-signature">
-                {$token->isStatic() ? 'static ' : ''}
-                {$token->isPublic() ? 'public ' : ''}
-                {$token->isProtected() ? 'protected ' : ''}
                 {"function "}
                 <code class="method-name">{$name}</code>
                 <hphpdoc:generics generics={$token->getGenericTypes()}/>
@@ -74,15 +64,9 @@ class :hphpdoc:method extends :x:element implements HasXHPHelpers
                 <hphpdoc:versions block={$phpdoc}/>
                 <hphpdoc:links block={$phpdoc}/>
                 {$this->getParameters($m, $mdParser)}
-                {$name === '__construct' || $name === '__destruct' ? null : $this->getReturns($m, $mdParser)}
+                {$this->getReturns($m, $mdParser)}
                 {$this->getThrows($m, $mdParser)}
             </div>
         </section>;
-    }
-
-    private function abbrClass(string $name): XHPChild
-    {
-        return strpos($name, '\\') !== false ?
-            <abbr title={$name}>{substr(strrchr($name, '\\'), 1)}</abbr> : $name;
     }
 }

@@ -23,9 +23,6 @@ use FredEmmott\DefinitionFinder\ScannedTypehint;
 
 /**
  * Any tag that includes a typehint, a name, and a description.
- *
- * @copyright 2016 Appertly
- * @license   Apache-2.0
  */
 class ParameterTag extends TypedTag
 {
@@ -69,9 +66,25 @@ class ParameterTag extends TypedTag
     }
 
     /**
-     * Returns a string representation.
-     *
-     * @return - The string representation
+     * {@inheritDoc}
+     */
+    public function isNeeded(\ConstVector<Tag> $tags): bool
+    {
+        if ($this->getName() !== 'param') {
+            return parent::isNeeded($tags);
+        }
+        foreach ($tags as $tag) {
+            if ($tag instanceof ParameterTag &&
+                $tag->getName() === 'param' &&
+                $tag->getVariable() === $this->variable) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function __toString(): string
     {

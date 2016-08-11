@@ -23,9 +23,6 @@ namespace Hphpdoc\Doc;
  * Superclass for any parsed PHPDoc.
  *
  * Implementors are meant to be immutable.
- *
- * @copyright 2016 Appertly
- * @license   Apache-2.0
  */
 class Tag
 {
@@ -41,7 +38,7 @@ class Tag
     /**
      * Gets the name of the tag
      *
-     * @return The name
+     * @return - The name
      */
     public function getName(): string
     {
@@ -49,9 +46,25 @@ class Tag
     }
 
     /**
+     * Whether this tag is needed in the vector.
+     *
+     * @param $tags - The tags
+     * @return - `true` if the tag is not duplicated in the vector
+     */
+    public function isNeeded(\ConstVector<Tag> $tags): bool
+    {
+        foreach ($tags as $tag) {
+            if ($tag->getName() === $this->name) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Returns a string representation.
      *
-     * @return The string representation
+     * @return - The string representation
      */
     public function __toString(): string
     {

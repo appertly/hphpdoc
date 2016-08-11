@@ -17,11 +17,26 @@
  * @copyright 2016 Appertly
  * @license   Apache-2.0
  */
-namespace Hphpdoc\Io;
+namespace Hphpdoc\Source;
+
+use Hphpdoc\Doc\Block;
 
 /**
- * Exception for I/O operations.
+ * A thing and its corresponding doc block
  */
-class IoException extends \RuntimeException
+interface Declaration
 {
+    /**
+     * Gets the source filename.
+     *
+     * @return - The filename
+     */
+    public function getFilename(): string;
+
+    /**
+     * Gets the doc comment block.
+     *
+     * @return - The doc block, which could be empty
+     */
+    public function getDocBlock(): Block;
 }

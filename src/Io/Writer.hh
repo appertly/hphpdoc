@@ -24,9 +24,6 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Writes stuff to the filesystem.
- *
- * @copyright 2016 Appertly
- * @license   Apache-2.0
  */
 class Writer
 {

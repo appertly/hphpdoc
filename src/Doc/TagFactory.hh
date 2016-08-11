@@ -91,7 +91,7 @@ class TagFactory
             if ($th !== null) {
                 $types[] = $th;
             }
-        } elseif ($matches[1] === 'returns' && $token instanceof ScannedFunctionAbstract) {
+        } elseif ($matches[1] === 'return' && $token instanceof ScannedFunctionAbstract) {
             $rt = $token->getReturnType();
             if ($type === '-' && $rt !== null) {
                 $types[] = $rt;
@@ -163,7 +163,7 @@ class TagFactory
                 if ($th !== null) {
                     $types[] = $th;
                 }
-            } elseif (self::$psrKeywords->contains($type) || preg_match('#[|\\\\]#', $type)) {
+            } elseif (self::$psrKeywords->contains($type) || preg_match('#[|\\\\<]#', $type) || (!$variable && !$description)) {
                 $description = "$variable $description";
                 $variable = $token->getName();
                 $types->addAll($this->parseTypes($type));
@@ -171,9 +171,9 @@ class TagFactory
                 $th = $token->getTypehint();
                 if ($th !== null && $th->getTypeName() !== 'mixed') {
                     if ($type === $th->getTypeText()) {
-                        $description = "$type $variable $description";
-                    } else {
                         $description = "$variable $description";
+                    } else {
+                        $description = "$type $variable $description";
                     }
                     $types[] = $th;
                 }

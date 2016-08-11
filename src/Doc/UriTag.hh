@@ -21,9 +21,6 @@ namespace Hphpdoc\Doc;
 
 /**
  * Any tag that includes a URI or a symbol and a description.
- *
- * @copyright 2016 Appertly
- * @license   Apache-2.0
  */
 class UriTag extends DescribedTag
 {
@@ -66,9 +63,24 @@ class UriTag extends DescribedTag
     }
 
     /**
-     * Returns a string representation.
-     *
-     * @return - The string representation
+     * {@inheritDoc}
+     */
+    public function isNeeded(\ConstVector<Tag> $tags): bool
+    {
+        if ($this->getName() !== 'license') {
+            return false;
+        }
+        foreach ($tags as $tag) {
+            if ($tag instanceof UriTag && $tag->getName() === 'license' &&
+                $tag->getUri() === $this->uri) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function __toString(): string
     {

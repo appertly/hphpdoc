@@ -15,7 +15,7 @@
  * the License.
  *
  * @copyright 2016 Appertly
- * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
+ * @license   Apache-2.0
  */
 
 /**
@@ -25,46 +25,41 @@ class :hphpdoc:properties-table extends :x:element implements HasXHPHelpers
 {
     use XHPHelpers;
     use Hphpdoc\Producer;
+    use MarkdownHelper;
 
     category %flow, %sectioning;
     children empty;
     attribute :section,
-        ConstVector<FredEmmott\DefinitionFinder\ScannedProperty> members @required;
+        ConstVector<Hphpdoc\Source\PropertyDeclaration> members @required;
 
     protected function render(): XHPRoot
     {
-        $properties = $this->:members;
+        $properties = $this->:members->toVector();
         if (count($properties) === 0) {
             return <x:frag/>;
         }
-        $parser = $this->getContext('docParser');
-        if (!($parser instanceof Hphpdoc\Doc\Parser)) {
-            $parser = new Hphpdoc\Doc\Parser();
-        }
-        $mdParser = $this->getContext('markdownParser');
-        if (!($mdParser instanceof League\CommonMark\DocParser)) {
-            $mdParser = new League\CommonMark\DocParser(
-                League\CommonMark\Environment::createCommonMarkEnvironment()
-            );
-        }
+        $mdParser = $this->getMarkdownParser();
         /* HH_FIXME[1002]: Bug in the typechecker */
         usort($properties, ($a, $b) ==> $a->getName() <=> $b->getName());
         $tbody = <tbody/>;
         $membersByVisibility = Map{'Public' => Vector{}, 'Protected' => Vector{}};
-        foreach ($properties as $m) {
+        foreach ($properties as $p) {
+            $m = $p->getToken();
             if ($m->isPublic()) {
-                $membersByVisibility['Public'][] = $m;
+                $membersByVisibility['Public'][] = $p;
             } elseif ($m->isProtected()) {
-                $membersByVisibility['Protected'][] = $m;
+                $membersByVisibility['Protected'][] = $p;
             }
         }
         if (count($membersByVisibility['Public']) === 0 &&
             count($membersByVisibility['Protected']) === 0) {
             return <x:frag/>;
         }
+        $title = $this->:title;
+        $this->removeAttribute('title');
         $section = <section class="properties-index">
             <header>
-                <h1>{$this->:title}</h1>
+                <h1>{$title}</h1>
             </header>
         </section>;
         foreach ($membersByVisibility as $vis => $props) {
@@ -73,20 +68,9 @@ class :hphpdoc:properties-table extends :x:element implements HasXHPHelpers
                 usort($props, ($a, $b) ==> $a->getName() <=> $b->getName());
                 $tbody = <tbody/>;
                 foreach ($props as $m) {
-                    $phpdoc = $parser->parse($m);
-                    $rt = Vector{$m->getTypehint()};
-                    $summary = trim($phpdoc->getSummary());
-                    foreach ($phpdoc->getTags() as $t) {
-                        if ($t->getName() === 'var' && $t instanceof Hphpdoc\Doc\TypedTag) {
-                            if ($rt[0] === null || $rt[0]?->getTypeName() === 'mixed') {
-                                $rt = $t->getTypes();
-                            }
-                            if (strlen($summary) === 0) {
-                                $summary = $t->getDescription();
-                            }
-                            break;
-                        }
-                    }
+                    $phpdoc = $m->getDocBlock();
+                    $rt = $m->getTypes();
+                    $summary = $m->getSummary();
                     $tbody->appendChild(
                         <tr>
                             <th scope="row"><code class="property-name"><var><a href={"#property_" . $m->getName()}>${$m->getName()}</a></var></code></th>

@@ -23,9 +23,6 @@ use FredEmmott\DefinitionFinder\ScannedTypehint;
 
 /**
  * Any tag that includes only a typehint and a description.
- *
- * @copyright 2016 Appertly
- * @license   Apache-2.0
  */
 class TypedTag extends DescribedTag
 {
@@ -69,9 +66,25 @@ class TypedTag extends DescribedTag
     }
 
     /**
-     * Returns a string representation.
-     *
-     * @return - The string representation
+     * {@inheritDoc}
+     */
+    public function isNeeded(\ConstVector<Tag> $tags): bool
+    {
+        if ($this->getName() === 'return') {
+            return parent::isNeeded($tags);
+        }
+        foreach ($tags as $tag) {
+            if ($tag instanceof TypedTag &&
+                $tag->getName() === $this->getName() &&
+                $tag->getTypes() == $this->types) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function __toString(): string
     {

@@ -15,15 +15,14 @@
  * the License.
  *
  * @copyright 2016 Appertly
- * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
+ * @license   Apache-2.0
  */
 
-use FredEmmott\DefinitionFinder\ScannedBase;
-use FredEmmott\DefinitionFinder\ScannedClass;
 use FredEmmott\DefinitionFinder\ScannedConstant;
-use FredEmmott\DefinitionFinder\ScannedMethod;
-use FredEmmott\DefinitionFinder\ScannedProperty;
-use Hphpdoc\Doc\Block;
+use Hphpdoc\Source\ClassyDeclaration;
+use Hphpdoc\Source\ConstantDeclaration;
+use Hphpdoc\Source\MethodDeclaration;
+use Hphpdoc\Source\PropertyDeclaration;
 use Hphpdoc\Job;
 
 /**
@@ -33,19 +32,19 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
 {
     use XHPHelpers;
     use Hphpdoc\Producer;
+    use MarkdownHelper;
 
     category %flow;
     children empty;
-    attribute :xhp:html-element,
-        Block block @required;
+    attribute :main;
 
     protected function render(): XHPRoot
     {
-        $block = $this->:block;
         $job = $this->getContext('job');
         $tbn = $job instanceof Job ? $job->getTokensByName() : ImmMap{};
-        $sc = $this->getContext('scannedClass');
-        invariant($sc instanceof ScannedClass, "scannedClass context value must be a ScannedClass");
+        $class = $this->getContext('classyDeclaration');
+        invariant($class instanceof ClassyDeclaration, "classyDeclaration context value must be a ClassyDeclaration");
+        $sc = $class->getToken();
 
         $parent = $sc->getParentClassInfo();
         $extends = $parent !== null ?
@@ -66,6 +65,7 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
             $implements->appendChild(<hphpdoc:typehint token={$v}/>);
         }
 
+        $block = $class->getDocBlock();
         $mdParser = $this->getMarkdownParser();
         $main = <main role="main">
             <header>
@@ -92,28 +92,28 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
             <hphpdoc:links block={$block}/>
         </main>;
 
-        $methods = $this->getMethods($sc, $tbn);
+        $methods = $class->getMethods();
         $methodsv = $methods->values();
-        $properties = $this->getProperties($sc, $tbn);
+        $properties = $class->getProperties();
         $propertiesv = $properties->values();
-        $constants = $sc->getConstants();
-        $main->appendChild(<hphpdoc:constants-table constants={$constants} />);
-        $main->appendChild(<hphpdoc:properties-table title="Instance Properties" members={$propertiesv->filter($a ==> !$a->isStatic())}/>);
-        $main->appendChild(<hphpdoc:properties-table title="Static Properties" members={$propertiesv->filter($a ==> $a->isStatic())}/>);
+        $constants = $class->getConstants();
+        $main->appendChild(<hphpdoc:constants-table constants={$constants->values()} title="Constants" />);
+        $main->appendChild(<hphpdoc:properties-table title="Instance Properties" members={$propertiesv->filter($a ==> !$a->getToken()->isStatic())}/>);
+        $main->appendChild(<hphpdoc:properties-table title="Static Properties" members={$propertiesv->filter($a ==> $a->getToken()->isStatic())}/>);
         $main->appendChild(<hphpdoc:methods-table title="Constructors / Destructors" methods={$methodsv->filter($a ==> !!preg_match('/^__(con|de)struct$/', $a->getName()))} />);
-        $main->appendChild(<hphpdoc:methods-table title="Instance Methods" methods={$methodsv->filter($a ==> !$a->isStatic() && !preg_match('/^__(con|de)struct$/', $a->getName()))} />);
-        $main->appendChild(<hphpdoc:methods-table title="Static Methods" methods={$methodsv->filter($a ==> $a->isStatic())} />);
+        $main->appendChild(<hphpdoc:methods-table title="Instance Methods" methods={$methodsv->filter($a ==> !$a->getToken()->isStatic() && !preg_match('/^__(con|de)struct$/', $a->getName()))} />);
+        $main->appendChild(<hphpdoc:methods-table title="Static Methods" methods={$methodsv->filter($a ==> $a->getToken()->isStatic())} />);
         $this->appendConstants($main, $constants);
         $this->appendProperties($main, $properties);
         $this->appendMethods($main, $methods);
         return $main;
     }
 
-    protected function appendConstants(:main $main, \ConstVector<ScannedConstant> $constants): void
+    protected function appendConstants(:main $main, \ConstMap<string,ConstantDeclaration> $constants): void
     {
         if (count($constants) > 0) {
-            /* HH_FIXME[1002]: Bug in the typechecker */
-            usort($constants, ($a, $b) ==> $a->getName() <=> $b->getName());
+            $constants = new Map($constants);
+            ksort($constants);
             $section = <section class="constant-details">
                 <header>
                     <h1>Constant Details</h1>
@@ -126,9 +126,9 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
         }
     }
 
-    protected function appendProperties(:main $main, \ConstMap<string,ScannedProperty> $membersByName): void
+    protected function appendProperties(:main $main, \ConstMap<string,PropertyDeclaration> $membersByName): void
     {
-        $membersByName = $membersByName->filter($a ==> !$a->isPrivate());
+        $membersByName = $membersByName->filter($a ==> !$a->getToken()->isPrivate());
         if (count($membersByName) > 0) {
             $members = new Map($membersByName);
             ksort($members);
@@ -144,9 +144,9 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
         }
     }
 
-    protected function appendMethods(:main $main, \ConstMap<string,ScannedMethod> $membersByName): void
+    protected function appendMethods(:main $main, \ConstMap<string,MethodDeclaration> $membersByName): void
     {
-        $membersByName = $membersByName->filter($a ==> !$a->isPrivate());
+        $membersByName = $membersByName->filter($a ==> !$a->getToken()->isPrivate());
         if (count($membersByName) > 0) {
             $members = new Map($membersByName);
             ksort($members);
@@ -160,57 +160,5 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
             }
             $main->appendChild($section);
         }
-    }
-
-    protected function getProperties(ScannedClass $c, ImmMap<string,ScannedBase> $tokensByName): \ConstMap<string,ScannedProperty>
-    {
-        $members = Map{};
-        $pi = $c->getParentClassName();
-        if ($pi !== null) {
-            $p = $tokensByName->get($pi) ?? $tokensByName->get($c->getNamespaceName() . '\\' . $pi);
-            if ($p instanceof ScannedClass) {
-                $members->setAll($this->getProperties($p, $tokensByName));
-            }
-        }
-        // TODO FredEmmott\DefinitionFinder has a bug with public properties
-        foreach ($c->getProperties()->filter($a ==> !$a->isPublic()) as $m) {
-            $members[$m->getName()] = $m;
-        }
-        return $members;
-    }
-
-    protected function getMethods(ScannedClass $c, ImmMap<string,ScannedBase> $tokensByName): \ConstMap<string,ScannedMethod>
-    {
-        $members = Map{};
-        $parents = Vector{};
-        if ($c->isInterface()) {
-            $parents = $c->getInterfaceNames();
-        } else {
-            $pcn = $c->getParentClassName();
-            if ($pcn !== null) {
-                $parents[] = $pcn;
-            }
-        }
-        foreach ($parents as $pi) {
-            $p = $tokensByName->get($pi) ?? $tokensByName->get($c->getNamespaceName() . '\\' . $pi);
-            if ($p instanceof ScannedClass) {
-                $members->setAll($this->getMethods($p, $tokensByName));
-            }
-        }
-        foreach ($c->getMethods() as $m) {
-            $members[$m->getName()] = $m;
-        }
-        return $members;
-    }
-
-    protected function getMarkdownParser(): League\CommonMark\DocParser
-    {
-        $mdParser = $this->getContext('markdownParser');
-        if (!($mdParser instanceof League\CommonMark\DocParser)) {
-            $mdParser = new League\CommonMark\DocParser(
-                League\CommonMark\Environment::createCommonMarkEnvironment()
-            );
-        }
-        return $mdParser;
     }
 }

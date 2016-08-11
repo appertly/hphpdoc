@@ -22,7 +22,7 @@ namespace Hphpdoc\Doc;
 /**
  * A parsed PHPDoc.
  */
-class Block
+class Block implements \Stringish
 {
     private string $summary;
     private string $description;
@@ -45,7 +45,7 @@ class Block
     /**
      * Gets the doc block summary
      *
-     * @return The summary
+     * @return - The summary
      */
     public function getSummary(): string
     {
@@ -55,7 +55,7 @@ class Block
     /**
      * Gets the doc block description.
      *
-     * @return The description
+     * @return - The description
      */
     public function getDescription(): string
     {
@@ -65,10 +65,54 @@ class Block
     /**
      * Gets the doc block tags.
      *
-     * @return The tags
+     * @return - The tags
      */
     public function getTags(): ImmVector<Tag>
     {
         return $this->tags;
+    }
+
+    /**
+     * Gets the string representation.
+     *
+     * @return - The string representation
+     */
+    public function __toString(): string
+    {
+        return implode("\n\n", array_filter([
+            $this->summary,
+            $this->description,
+            implode("\n", $this->tags),
+        ]));
+    }
+
+    /**
+     * Combines this block with a parent block
+     *
+     * @param $block - The parent block, or `null`
+     * @return - The new combined block
+     */
+    public function inherit(?Block $block): Block
+    {
+        if ($block === null) {
+            return $this;
+        } elseif ($this->description === '' && count($this->tags) === 0 &&
+            ($this->summary === '{@inheritDoc}' || $this->summary === '')) {
+            return $block;
+        }
+        $summary = $this->summary ?: $block->summary;
+        $description = '';
+        if (strpos($this->description, '{@inheritDoc}') !== false) {
+            $description = str_replace('{@inheritDoc}', $block->description, $this->description);
+        } else {
+            $description = $this->description ?: $block->description;
+        }
+        $tags = new Vector($this->tags);
+        foreach ($block->getTags() as $tag) {
+            if ($tag->isNeeded($tags)) {
+                $tags[] = $tag;
+            }
+        }
+        return new Block($summary, $description, $tags);
     }
 }

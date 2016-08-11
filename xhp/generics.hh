@@ -15,7 +15,7 @@
  * the License.
  *
  * @copyright 2016 Appertly
- * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
+ * @license   Apache-2.0
  */
 
 /**
@@ -50,10 +50,16 @@ class :hphpdoc:generics extends :x:element implements HasXHPHelpers
             $tag->appendChild(<code class="generic-type"><var>{$t->getName()}</var></code>);
             if ($t->getConstraintRelationship() !== null) {
                 $tag->appendChild(<code class="generic-constraint">{" " . $t->getConstraintRelationship() . " "}</code>);
-                $tag->appendChild(<code class="generic-constrainttype">{$t->getConstraintTypeName()}</code>);
+                $tag->appendChild(<code class="generic-constrainttype">{$this->abbrClass((string) $t->getConstraintTypeName())}</code>);
             }
         }
         $tag->appendChild(<span class="separator-generic">{">"}</span>);
         return $tag;
+    }
+
+    private function abbrClass(string $name): XHPChild
+    {
+        return strpos($name, '\\') !== false ?
+            <abbr title={$name}>{substr(strrchr($name, '\\'), 1)}</abbr> : $name;
     }
 }

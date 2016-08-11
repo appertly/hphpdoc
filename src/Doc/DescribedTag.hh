@@ -21,9 +21,6 @@ namespace Hphpdoc\Doc;
 
 /**
  * Any tag that includes only a typehint and a description.
- *
- * @copyright 2016 Appertly
- * @license   Apache-2.0
  */
 class DescribedTag extends Tag
 {
@@ -43,7 +40,7 @@ class DescribedTag extends Tag
     /**
      * Gets the tag description.
      *
-     * @return The tag description
+     * @return - The tag description
      */
     public function getDescription(): string
     {
@@ -51,9 +48,7 @@ class DescribedTag extends Tag
     }
 
     /**
-     * Returns a string representation.
-     *
-     * @return The string representation
+     * {@inheritDoc}
      */
     public function __toString(): string
     {

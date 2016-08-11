@@ -40,7 +40,7 @@ class StderrLogger implements LoggerInterface
         LogLevel::WARNING   => 4,
         LogLevel::NOTICE    => 5,
         LogLevel::INFO      => 6,
-        LogLevel::DEBUG     => 7
+        LogLevel::DEBUG     => 7,
     };
 
     /**
@@ -65,9 +65,9 @@ class StderrLogger implements LoggerInterface
      * @param $context - Optional context
      */
     /* HH_IGNORE_ERROR[4032]: Need to be compatible with PHP 7 */
-    public function log(mixed $level, $message, array<string,mixed> $context = []) : void
+    public function log(mixed $level, $message, array<string,mixed> $context = []): void
     {
-        if (!self::$rankings->containsKey($level)) {
+        if (!array_key_exists($level, self::$rankings)) {
             throw new \Psr\Log\InvalidArgumentException("Unknown log level: " . (string)$level);
         }
         $ilevel = self::$rankings[(string)$level];

@@ -15,7 +15,7 @@
  * the License.
  *
  * @copyright 2016 Appertly
- * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
+ * @license   Apache-2.0
  */
 
 /**
@@ -30,7 +30,7 @@ class :hphpdoc:classlike-table extends :x:element implements HasXHPHelpers
     children empty;
     attribute :section,
         Stringish title @required,
-        Traversable<FredEmmott\DefinitionFinder\ScannedClass> tokens @required;
+        Traversable<Hphpdoc\Source\ClassyDeclaration> tokens @required;
 
     protected function render(): XHPRoot
     {
@@ -39,10 +39,6 @@ class :hphpdoc:classlike-table extends :x:element implements HasXHPHelpers
             return <x:frag/>;
         }
         $tb = <tbody/>;
-        $parser = $this->getContext('docParser');
-        if (!($parser instanceof Hphpdoc\Doc\Parser)) {
-            $parser = new Hphpdoc\Doc\Parser();
-        }
         $mdParser = $this->getContext('markdownParser');
         if (!($mdParser instanceof League\CommonMark\DocParser)) {
             $mdParser = new League\CommonMark\DocParser(
@@ -50,20 +46,22 @@ class :hphpdoc:classlike-table extends :x:element implements HasXHPHelpers
             );
         }
         foreach ($tokens as $c) {
-            $block = $parser->parse($c);
+            $t = $c->getToken();
             $tb->appendChild(
                 <tr>
                     <th scope="row">
-                        <a class="class-name" href={$this->getFilename($c)}>{$c->getShortName()}</a>
-                        <hphpdoc:generics generics={$c->getGenericTypes()}/>
+                        <a class="class-name" href={$this->getFilename($t)}>{$t->getShortName()}</a>
+                        <hphpdoc:generics generics={$t->getGenericTypes()}/>
                     </th>
-                    <td><axe:markdown text={$block->getSummary()} docParser={$mdParser}/></td>
+                    <td><axe:markdown text={$c->getDocBlock()->getSummary()} docParser={$mdParser}/></td>
                 </tr>
             );
         }
+        $title = $this->:title;
+        $this->removeAttribute('title');
         return <section>
             <header>
-                <h1>{$this->:title}</h1>
+                <h1>{$title}</h1>
             </header>
             <table>
                 <thead>

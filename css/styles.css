@@ -79,6 +79,10 @@ main > section > section > header > h1 {
 p, pre, table {
 	margin: 1.25em 0;
 }
+pre {
+    padding: 1.25em;
+    background-color: #fff;
+}
 dl, menu, ol, ul {
 	margin: 1.25em 0;
 }
@@ -211,7 +215,7 @@ td .method-summary p
     text-align: left;
 }
 
-.method-section {
+.method-section, .property-section, .constant-section {
     background-color: #f3f3f3;
     padding: 1.25em;
     padding-bottom: 1px;
@@ -248,7 +252,7 @@ td .method-summary p
 .method-name a {
     border-bottom: 1px dotted rgba(108, 113, 196, 0.62);
 }
-.ref a {
+.ref abbr {
     border-bottom: 1px dotted rgba(38, 139, 210, 0.62);
 }
 a.class-name,
@@ -259,4 +263,27 @@ a.class-name,
 }
 .separator-generic, .separator-parameter, .nullable {
     color: #839496;
+}
+.label {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    display: inline-block;
+    font-size: 12px;
+    line-height: 12px;
+    padding: 4px 10px;
+}
+
+ul.namespaces {
+    list-style: none;
+    padding-left: 0;
+}
+ul.namespaces li {
+    background-color: #EEE8D5;
+    padding: 0.625em 0.625em;
+    padding-bottom: 9px;
+    border-bottom: 1px solid #e0e0e0;
+}
+ul.namespaces li:nth-child(even) {
+    background-color: #FDF6E3;
 }

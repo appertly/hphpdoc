@@ -43,14 +43,27 @@ class Parser
      * Parses a doc comment.
      *
      * @param $token - The token whose doc comment will be evaluated
-     * @return The parsed block
+     * @return - The parsed block
      */
     public function parse(?ScannedBase $token): Block
     {
-        $comment = $this->extract((string)$token?->getDocComment());
-        if ($this->cache->containsKey($comment)) {
-            return $this->cache[$comment];
-        }
+        return $this->parseString($token?->getDocComment(), $token);
+    }
+
+    /**
+     * Parses a doc comment string.
+     *
+     * @param $comment - The doc comment
+     * @param $token - The token whose doc comment will be evaluated
+     * @return - The parsed block
+     */
+    public function parseString(?string $comment, ?ScannedBase $token = null): Block
+    {
+        $comment = $this->extract((string)$comment);
+        // TODO per-namespace caching
+        // if ($this->cache->containsKey($comment)) {
+        //    return $this->cache[$comment];
+        // }
         $opener = '';
         $description = '';
         $tags = Vector{};
@@ -78,12 +91,12 @@ class Parser
      * Extract the content from the comment.
      *
      * @param $comment - The comment to clean up
-     * @return The extracted content
+     * @return - The extracted content
      */
     protected function extract(string $comment): string
     {
         // get rid of potential carriage returns
-        $comment = str_replace("\r", "", $comment);
+        $comment = preg_replace("/\R/", "\n", $comment);
         // remove leading spaces
         $comment = preg_replace("/^\s+/m", "", $comment);
         // remove leading asterisks

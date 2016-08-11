@@ -21,9 +21,6 @@ namespace Hphpdoc\Doc;
 
 /**
  * Any tag that includes a version number and a description.
- *
- * @copyright 2016 Appertly
- * @license   Apache-2.0
  */
 class VersionTag extends DescribedTag
 {
@@ -66,9 +63,7 @@ class VersionTag extends DescribedTag
     }
 
     /**
-     * Returns a string representation.
-     *
-     * @return - The string representation
+     * {@inheritDoc}
      */
     public function __toString(): string
     {
