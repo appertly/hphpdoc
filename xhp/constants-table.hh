@@ -34,7 +34,7 @@ class :hphpdoc:constants-table extends :x:element implements HasXHPHelpers
 
     protected function render(): XHPRoot
     {
-        $constants = $this->:constants;
+        $constants = new Vector($this->:constants);
         if (count($constants) === 0) {
             return <x:frag/>;
         }
