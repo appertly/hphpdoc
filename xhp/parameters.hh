@@ -40,10 +40,12 @@ class :hphpdoc:parameters extends :x:element implements HasXHPHelpers
         $tags = $function->getParameterTags();
         $params = $function->getToken()->getParameters();
         foreach ($params as $i => $param) {
-            $rt = Vector{$param->getTypehint()};
+            $th = $param->getTypehint();
+            $rt = Vector{$th};
             $t = $tags[$param->getName()];
             $description = $t->getDescription();
-            if ($rt[0] === null || $rt[0]?->getTypeName() === 'mixed') {
+            $tht = $th?->getTypeText();
+            if ($th === null || $th->getTypeName() === 'mixed' || $tht === 'array') {
                 $rt = $t->getTypes();
             }
             if ($i > 0) {

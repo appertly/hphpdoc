@@ -66,8 +66,10 @@ class :hphpdoc:methods-table extends :x:element implements HasXHPHelpers
                 $tbody = <tbody/>;
                 foreach ($methods as $m) {
                     $phpdoc = $m->getDocBlock();
-                    $rt = Vector{$m->getToken()->getReturnType()};
-                    if ($rt[0] === null || $rt[0]?->getTypeName() === 'mixed') {
+                    $th = $m->getToken()->getReturnType();
+                    $rt = Vector{$th};
+                    $tht = $th?->getTypeText();
+                    if ($th === null || $th->getTypeName() === 'mixed' || $tht === 'array') {
                         $ret = $m->getReturnsTag();
                         if ($ret !== null) {
                             $rt = $ret->getTypes();

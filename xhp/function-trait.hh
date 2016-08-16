@@ -35,10 +35,11 @@ trait FunctionHelper
         if ($returnType !== null && $this->isVoid($returnType)) {
             return null;
         }
+        $tht = $returnType?->getTypeText();
         $rt = Vector{$returnType};
         $tag = $function->getReturnsTag();
         $description = $tag?->getDescription();
-        if ($tag !== null && ($rt[0] === null || $rt[0]?->getTypeName() === 'mixed')) {
+        if ($tag !== null && ($returnType === null || $returnType->getTypeName() === 'mixed' || $tht === 'array')) {
             $rt = $tag->getTypes();
         }
         return <table class="tags-return">
@@ -67,10 +68,12 @@ trait FunctionHelper
         $tbody = <tbody/>;
         $tags = $function->getParameterTags();
         foreach ($params as $p) {
-            $rt = Vector{$p->getTypehint()};
+            $th = $p->getTypehint();
+            $rt = Vector{$th};
             $t = $tags[$p->getName()];
             $description = $t->getDescription();
-            if ($rt[0] === null || $rt[0]?->getTypeName() === 'mixed') {
+            $tht = $th?->getTypeText();
+            if ($th === null || $th->getTypeName() === 'mixed' || $tht === 'array') {
                 $rt = $t->getTypes();
             }
             $tbody->appendChild(

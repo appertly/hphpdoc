@@ -44,8 +44,10 @@ class :hphpdoc:functions-table extends :x:element implements HasXHPHelpers
         $tbody = <tbody/>;
         foreach ($functions as $m) {
             $phpdoc = $m->getDocBlock();
-            $rt = Vector{$m->getToken()->getReturnType()};
-            if ($rt[0] === null || $rt[0]?->getTypeName() === 'mixed') {
+            $th = $m->getToken()->getReturnType();
+            $tht = $th?->getTypeText();
+            $rt = Vector{$th};
+            if ($th === null || $th->getTypeName() === 'mixed' || $tht === 'array') {
                 foreach ($phpdoc->getTags() as $t) {
                     if ($t->getName() === 'return' && $t instanceof Hphpdoc\Doc\TypedTag) {
                         $rt = $t->getTypes();

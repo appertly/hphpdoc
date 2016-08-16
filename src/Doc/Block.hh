@@ -102,6 +102,12 @@ class Block implements \Stringish
         }
         $summary = $this->summary ?: $block->summary;
         $description = '';
+        if ($this->summary === '{@inheritDoc}') {
+            $summary = $block->summary;
+            if ($this->description === '') {
+                $description = $block->description;
+            }
+        }
         if (strpos($this->description, '{@inheritDoc}') !== false) {
             $description = str_replace('{@inheritDoc}', $block->description, $this->description);
         } else {
