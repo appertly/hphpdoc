@@ -25,7 +25,7 @@ Our code is intended to comply with [PSR-1](http://www.php-fig.org/psr/psr-1/), 
 
 ## Usage
 
-You can view a list of all command line options with the `-h` or `--help` flags, or by simply calling the executable on its own.
+You can view a list of all command line options with the `-h` or `--help` flags, or by simply calling the `hphpdoc` executable with no arguments.
 
 ```
 Usage:  hphpdoc [options] [--] [args...]
