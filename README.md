@@ -3,6 +3,9 @@ API Documentation Generator for Hack/HHVM and PHP
 
 Check out some example documentation: actually, [it's our own API](https://appertly.github.io/hphpdoc/api/). Please have a look.
 
+[![Packagist](https://img.shields.io/packagist/v/appertly/hphpdoc.svg)](https://packagist.org/packages/appertly/hphpdoc)
+[![Build Status](https://travis-ci.org/appertly/hphpdoc.svg)](https://travis-ci.org/appertly/hphpdoc)
+
 ## Installation
 
 You can install this library using Composer:

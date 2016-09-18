@@ -1,0 +1,16 @@
+sudo: required
+dist: trusty
+language: php
+php:
+  - hhvm
+before_install:
+  - composer self-update
+install:
+  - composer update --ignore-platform-reqs --prefer-source
+before_script:
+  - sudo cat travis-php.ini >> /etc/hhvm/php.ini
+script:
+  - hhvm vendor/bin/hackunit tests
+cache:
+  directories:
+    - $HOME/.composer/cache
