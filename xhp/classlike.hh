@@ -48,15 +48,18 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
 
         $parent = $sc->getParentClassInfo();
         $extends = $parent !== null ?
-            <p class="class-extends">{"Extends "}<hphpdoc:typehint token={$parent}/></p> :
-            <x:frag/>;
+            <code class="class-extends">{" extends "}<hphpdoc:typehint token={$parent}/></code> :
+            null;
+
+        $finality = $sc->isFinal() ? <code class="class-finality">{"final "}</code> : null;
+        $abstractness = $sc->isAbstract() ? <code class="class-abstractness">{"abstract "}</code> : null;
 
         $interfaces = $sc->getInterfaceInfo();
         $implements = count($interfaces) > 0 ?
-            <p class="class-implements">
-                {$sc->isInterface() ? 'Extends' : 'Implements'}
+            <code class="class-implements">
+                {$sc->isInterface() ? ' extends' : ' implements'}
                 {" "}
-            </p>:
+            </code>:
             <x:frag />;
         foreach ($interfaces as $i => $v) {
             if ($i > 0) {
@@ -73,15 +76,18 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
                     <li>In Namespace <hphpdoc:namespace-link namespace={$sc->getNamespaceName()}/></li>
                 </ul>
                 <h1>
-                    <span class="token-type">{$sc->isTrait() ? "Trait" : ($sc->isInterface() ? "Interface" : "Class")}</span>
-                    {" "}
-                    <span class="class-name">
-                        {$sc->getShortName()}
-                    </span>
+                    <span class="class-name">{$sc->getShortName()}</span>
                     <hphpdoc:generics generics={$sc->getGenericTypes()}/>
                 </h1>
-                {$extends}
-                {$implements}
+                <div class="class-signature">
+                    {$finality}
+                    {$abstractness}
+                    <code class="class-type">{$sc->isTrait() ? "trait " : ($sc->isInterface() ? "interface " : "class ")}</code>
+                    <code class="class-name">{$sc->getShortName()}</code>
+                    <hphpdoc:generics generics={$sc->getGenericTypes()}/>
+                    {$extends}
+                    {$implements}
+                </div>
                 <div class="class-summary"><axe:markdown text={$block->getSummary()} docParser={$mdParser}/></div>
             </header>
             <div class="class-description">

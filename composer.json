@@ -4,9 +4,14 @@
     "keywords": ["hack", "hhvm", "php", "api", "documentation"],
     "homepage": "http://github.com/appertly/hphpdoc",
     "license": "Apache-2.0",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.3.x-dev"
+        }
+    },
     "require": {
         "hhvm": "~3.12",
-        "fredemmott/definition-finder": "^1.1.2",
+        "fredemmott/definition-finder": "^1.2.0",
         "appertly/cleopatra": "~0.1",
         "appertly/axe": "~0.1",
         "appertly/axe-markdown": "~0.1",

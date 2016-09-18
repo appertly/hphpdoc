@@ -57,8 +57,10 @@ class :hphpdoc:method extends :x:element implements HasXHPHelpers
                 {$labels}
             </header>
             <div class="method-signature">
-                {$token->isStatic() ? 'static ' : ''}
+                {$token->isAbstract() ? 'abstract ' : ''}
+                {$token->isFinal() ? 'final ' : ''}
                 {$token->isPublic() ? 'public ' : ''}
+                {$token->isStatic() ? 'static ' : ''}
                 {$token->isProtected() ? 'protected ' : ''}
                 {"function "}
                 <code class="method-name">{$name}</code>
