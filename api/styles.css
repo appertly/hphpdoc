@@ -49,6 +49,7 @@ main > header > h1 {
     line-height: 60px;
     padding-bottom: 18px;
     border-bottom: 2px solid #DC322F;
+    margin-bottom: 20px;
 }
 
 section > header > h1 {
@@ -222,7 +223,7 @@ td .method-summary p
     padding-top: 19px;
     margin-bottom: 1.25em;
 }
-.method-section .method-signature, .property-section .property-signature, .constant-section .constant-signature {
+.method-section .method-signature, .property-section .property-signature, .constant-section .constant-signature, .class-signature {
     padding: 1.25em;
     color: #FDF6E3;
     background-color: #073642;
