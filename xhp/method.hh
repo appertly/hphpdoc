@@ -43,12 +43,12 @@ class :hphpdoc:method extends :x:element implements HasXHPHelpers
         invariant($cd instanceof Hphpdoc\Source\ClassyDeclaration, "classyDeclaration context value must be a ClassyDeclaration");
         $mdParser = $this->getMarkdownParser();
         $phpdoc = $m->getDocBlock();
-        // TODO show method being final
-        // TODO show method being abstract
         $labels = <p class="method-labels"/>;
-        if ($cd->getName() !== $m->getClass()->getName()) {
+        $mclass = $m->getClass();
+        if ($cd->getName() !== $mclass->getName()) {
+            $th = new FredEmmott\DefinitionFinder\ScannedTypehint($mclass->getName(), Vector{}, false);
             $labels->appendChild(
-                <span class="label">Inherited from {$this->abbrClass($m->getClass()->getName())}</span>
+                <span class="label">Inherited from <hphpdoc:typehint token={$th}/></span>
             );
         }
         return <section id={"method_$name"} class="method-section">
@@ -56,8 +56,8 @@ class :hphpdoc:method extends :x:element implements HasXHPHelpers
                 <h1>{$name}</h1>
                 {$labels}
             </header>
-            <div class="method-signature">
-                {$token->isAbstract() ? 'abstract ' : ''}
+            <div class="signature method-signature">
+                {$token->isAbstract() || $mclass->isInterface() ? 'abstract ' : ''}
                 {$token->isFinal() ? 'final ' : ''}
                 {$token->isPublic() ? 'public ' : ''}
                 {$token->isStatic() ? 'static ' : ''}
@@ -80,11 +80,5 @@ class :hphpdoc:method extends :x:element implements HasXHPHelpers
                 {$this->getThrows($m, $mdParser)}
             </div>
         </section>;
-    }
-
-    private function abbrClass(string $name): XHPChild
-    {
-        return strpos($name, '\\') !== false ?
-            <abbr title={$name}>{substr(strrchr($name, '\\'), 1)}</abbr> : $name;
     }
 }

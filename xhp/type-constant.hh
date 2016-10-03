@@ -18,12 +18,12 @@
  * @license   Apache-2.0
  */
 
-use Hphpdoc\Source\PropertyDeclaration;
+use Hphpdoc\Source\TypeConstantDeclaration;
 
 /**
- * Renders a property.
+ * Renders a constant.
  */
-class :hphpdoc:property extends :x:element implements HasXHPHelpers
+class :hphpdoc:type-constant extends :x:element implements HasXHPHelpers
 {
     use XHPHelpers;
     use Hphpdoc\Producer;
@@ -31,46 +31,44 @@ class :hphpdoc:property extends :x:element implements HasXHPHelpers
 
     category %flow, %sectioning;
     children empty;
-    attribute :section,
-        PropertyDeclaration property @required;
+    attribute :xhp:html-element,
+        TypeConstantDeclaration constant @required;
 
     protected function render(): XHPRoot
     {
-        $m = $this->:property;
-        $token = $m->getToken();
-        $name = $token->getName();
-        $cd = $this->getContext('classyDeclaration');
-        invariant($cd instanceof Hphpdoc\Source\ClassyDeclaration, "classyDeclaration context value must be a ClassyDeclaration");
+        $m = $this->:constant;
         $mdParser = $this->getMarkdownParser();
         $phpdoc = $m->getDocBlock();
         $summary = $m->getSummary();
-        $rt = $m->getTypes();
-        $labels = <p class="method-labels"/>;
+        $rt = $m->getType();
+        $inherit = null;
+        $cd = $this->getContext('classyDeclaration');
+        $labels = <p class="constant-labels"/>;
         $mclass = $m->getClass();
-        if ($cd->getName() !== $mclass->getName()) {
+        if ($mclass !== null && $cd instanceof Hphpdoc\Source\ClassyDeclaration
+                && $mclass->getName() !== $cd->getName()) {
             $th = new FredEmmott\DefinitionFinder\ScannedTypehint($mclass->getName(), Vector{}, false);
             $labels->appendChild(
                 <span class="label">Inherited from <hphpdoc:typehint token={$th}/></span>
             );
         }
-        return <section id={"property_$name"} class="property-section">
+        return <section id={"type_constant_" . $m->getToken()->getShortName()} class="constant-section">
             <header>
-                <h1>${$name}</h1>
+                <h1>{$m->getToken()->getShortName()}</h1>
                 {$labels}
             </header>
-            <div class="signature property-signature">
-                {$token->isStatic() ? 'static ' : ''}
-                {$token->isPublic() ? 'public ' : ''}
-                {$token->isProtected() ? 'protected ' : ''}
-                <code class="property-type">
-                    <hphpdoc:typehints tokens={$rt}/>
+            <div class="signature constant-signature">
+                {$m->getToken()->isAbstract() ? 'abstract ' : ''}
+                {"const type "}
+                <code class="constant-name">{$m->getToken()->getShortName()}</code>
+                <code class="separator-constant">{" = "}</code>
+                <code class="constant-type">
+                    <hphpdoc:typehint token={$rt}/>
                 </code>
-                {" "}
-                <code class="property-name"><var>${$name}</var></code>
             </div>
-            <div class="property-details">
-                <div class="property-summary"><axe:markdown text={$summary} docParser={$mdParser}/></div>
-                <div class="property-description">
+            <div class="constant-details">
+                <div class="constant-summary"><axe:markdown text={$summary} docParser={$mdParser}/></div>
+                <div class="constant-description">
                     <axe:markdown text={$phpdoc->getDescription()} docParser={$mdParser}/>
                 </div>
                 <hphpdoc:authorship block={$phpdoc}/>

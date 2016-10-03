@@ -10,7 +10,7 @@ class JobTest
     public async function testGetDestination(Assert $assert): Awaitable<void>
     {
         $destination = "/tmp/foo";
-        $token = new \FredEmmott\DefinitionFinder\ScannedConstant(shape('filename' => __FILE__), 'TESTING', "/** Hi */", '', null);
+        $token = new \FredEmmott\DefinitionFinder\ScannedConstant('TESTING', shape('position' => shape('filename' => __FILE__, 'line' => null), 'sourceType' => \FredEmmott\DefinitionFinder\SourceType::HACK_STRICT), "/** Hi */", '', null);
         $parser = new Doc\Parser();
         $job = new Job($destination, new Source\Mapper(Vector{$token}, $parser));
         $assert->string($job->getDestination())->is($destination);
@@ -19,7 +19,7 @@ class JobTest
     <<Test>>
     public async function testGetTokensByName(Assert $assert): Awaitable<void>
     {
-        $token = new \FredEmmott\DefinitionFinder\ScannedConstant(shape('filename' => __FILE__), 'TESTING', "/** Hi */", '', null);
+        $token = new \FredEmmott\DefinitionFinder\ScannedConstant('TESTING', shape('position' => shape('filename' => __FILE__, 'line' => null), 'sourceType' => \FredEmmott\DefinitionFinder\SourceType::HACK_STRICT), "/** Hi */", '', null);
         $parser = new Doc\Parser();
         $job = new Job("/tmp/bar", new Source\Mapper(Vector{$token}, $parser));
         $tokens = Map{'TESTING' => $token};
@@ -29,7 +29,7 @@ class JobTest
     <<Test>>
     public async function testGetTokens(Assert $assert): Awaitable<void>
     {
-        $token = new \FredEmmott\DefinitionFinder\ScannedConstant(shape('filename' => __FILE__), 'TESTING', "/** Hi */", '', null);
+        $token = new \FredEmmott\DefinitionFinder\ScannedConstant('TESTING', shape('position' => shape('filename' => __FILE__, 'line' => null), 'sourceType' => \FredEmmott\DefinitionFinder\SourceType::HACK_STRICT), "/** Hi */", '', null);
         $parser = new Doc\Parser();
         $tokens = Vector{$token};
         $job = new Job("/tmp/bar", new Source\Mapper($tokens, $parser));

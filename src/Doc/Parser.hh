@@ -100,7 +100,7 @@ class Parser
         // remove leading spaces
         $comment = preg_replace("/^\s+/m", "", $comment);
         // remove leading asterisks
-        $comment = preg_replace("/^\*([\t ]+|$)/m", "", $comment);
+        $comment = preg_replace("/^\*([\t ]|$)/m", "", $comment);
         // remove leading slash
         $comment = preg_replace("#^/\*\*#", "", $comment);
         // remove ending slash

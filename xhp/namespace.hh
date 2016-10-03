@@ -19,6 +19,7 @@
  */
 
 use FredEmmott\DefinitionFinder\ScannedBasicClass;
+use FredEmmott\DefinitionFinder\ScannedBase;
 use FredEmmott\DefinitionFinder\ScannedConstant;
 use FredEmmott\DefinitionFinder\ScannedTrait;
 use FredEmmott\DefinitionFinder\ScannedInterface;
@@ -37,7 +38,7 @@ class :hphpdoc:namespace extends :x:element implements HasXHPHelpers
     children empty;
     attribute :main,
         string namespace @required,
-        Traversable<TokenDeclaration> declarations @required,
+        Traversable<TokenDeclaration<ScannedBase>> declarations @required,
         ConstSet<string> namespaces @required;
 
     protected function render(): XHPRoot

@@ -19,9 +19,9 @@
  */
 
 /**
- * Renders a summary table of constants.
+ * Renders a summary table of type constants.
  */
-class :hphpdoc:constants-table extends :x:element implements HasXHPHelpers
+class :hphpdoc:type-constants-table extends :x:element implements HasXHPHelpers
 {
     use XHPHelpers;
     use Hphpdoc\Producer;
@@ -30,28 +30,25 @@ class :hphpdoc:constants-table extends :x:element implements HasXHPHelpers
     category %flow, %sectioning;
     children empty;
     attribute :section,
-        ConstVector<Hphpdoc\Source\ConstantDeclaration> constants @required;
+        ConstVector<Hphpdoc\Source\TypeConstantDeclaration> typeConstants @required;
 
     protected function render(): XHPRoot
     {
-        $constants = new Vector($this->:constants);
-        if (count($constants) === 0) {
+        $typeConstants = new Vector($this->:typeConstants);
+        if (count($typeConstants) === 0) {
             return <x:frag/>;
         }
         $mdParser = $this->getMarkdownParser();
         /* HH_FIXME[1002]: Bug in the typechecker */
-        usort($constants, ($a, $b) ==> $a->getName() <=> $b->getName());
+        usort($typeConstants, ($a, $b) ==> $a->getName() <=> $b->getName());
         $tbody = <tbody/>;
-        foreach ($constants as $m) {
+        foreach ($typeConstants as $m) {
             $phpdoc = $m->getDocBlock();
-            $rt = $m->getType();
             $summary = $m->getSummary();
-            $file = $m->getClass() === null ? 'constants-' . str_replace('\\', '_', $m->getToken()->getNamespaceName()) . '.html' : '';
             $name = $m->getToken()->getShortName();
             $tbody->appendChild(
                 <tr>
-                    <th scope="row"><code class="constant-name"><a href={"$file#constant_$name"}>{$name}</a></code></th>
-                    <td><hphpdoc:typehint token={$rt}/></td>
+                    <th scope="row"><code class="constant-name"><a href={"#type_constant_$name"}>{$name}</a></code></th>
                     <td><div class="constant-summary"><axe:markdown text={$summary} docParser={$mdParser}/></div></td>
                 </tr>
             );
@@ -62,14 +59,13 @@ class :hphpdoc:constants-table extends :x:element implements HasXHPHelpers
         if ($title) {
             $header = <header><h1>{$title}</h1></header>;
         }
-        return <section class="symbol-index constants-index">
+        return <section class="symbol-index type-constants-index">
             {$header}
             <table>
-                <caption>Constants</caption>
+                <caption>Type Constants</caption>
                 <thead>
                     <tr>
                         <th scope="col">Name</th>
-                        <th scope="col">Type</th>
                         <th scope="col">Summary</th>
                     </tr>
                 </thead>

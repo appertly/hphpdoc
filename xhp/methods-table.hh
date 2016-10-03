@@ -54,7 +54,7 @@ class :hphpdoc:methods-table extends :x:element implements HasXHPHelpers
         }
         $title = $this->:title;
         $this->removeAttribute('title');
-        $methodSection = <section class="methods-index">
+        $methodSection = <section class="symbol-index methods-index">
             <header>
                 <h1>{$title}</h1>
             </header>
@@ -80,7 +80,7 @@ class :hphpdoc:methods-table extends :x:element implements HasXHPHelpers
                         <tr>
                             <td><hphpdoc:typehints tokens={$rt} returnType={true}/></td>
                             <td>
-                                <div class="method-signature">
+                                <div class="signature method-signature">
                                     <code class="method-name"><a href={"#method_" . $m->getName()}>{$m->getName()}</a></code>
                                     <hphpdoc:generics generics={$m->getToken()->getGenericTypes()}/>
                                     <hphpdoc:parameters member={$m}/>

@@ -87,7 +87,7 @@ class TagFactory
         list($type, $description) = array_pad(preg_split('/\s+/', $matches[2], 2), 2, '');
         $types = Vector{};
         if ($matches[1] === 'throws') {
-            $th = $this->stringToTypehint($type);
+            $th = $this->stringToTypehint($type, $token);
             if ($th !== null) {
                 $types[] = $th;
             }
@@ -97,13 +97,14 @@ class TagFactory
                 $types[] = $rt;
             } elseif (self::$thisy->contains($type) && ($rt === null || self::$thisy->contains($rt->getTypeName()))) {
                 $th = $this->stringToTypehint(
-                    $token instanceof ScannedMethod && $token->isStatic() ? 'static' : '$this'
+                    $token instanceof ScannedMethod && $token->isStatic() ? 'static' : '$this',
+                    $token,
                 );
                 if ($th !== null) {
                     $types[] = $th;
                 }
             } else {
-                $types->addAll($this->parseTypes($type));
+                $types->addAll($this->parseTypes($type, $token));
             }
         }
         return new TypedTag($matches[1], $types, $description);
@@ -126,7 +127,7 @@ class TagFactory
         if ($token instanceof ScannedConstant) {
             if ($variable === $token->getName()) {
                 // best case scenario
-                $types->addAll($this->parseTypes($type));
+                $types->addAll($this->parseTypes($type, $token));
             } elseif ($type === $token->getName()) {
                 if ($variable !== '-') {
                     $description = "$variable $description";
@@ -138,7 +139,7 @@ class TagFactory
                 }
             } elseif (self::$constants->contains($type)) {
                 $description = "$variable $description";
-                $th = $this->stringToTypehint($type);
+                $th = $this->stringToTypehint($type, $token);
                 if ($th !== null) {
                     $types[] = $th;
                 }
@@ -153,7 +154,7 @@ class TagFactory
         } elseif ($token instanceof ScannedProperty) {
             if (substr($variable, 0, 1) === '$') {
                 // best case scenario
-                $types->addAll($this->parseTypes($type));
+                $types->addAll($this->parseTypes($type, $token));
             } elseif (substr($type, 0, 1) === '$') {
                 if ($variable !== '-') {
                     $description = "$variable $description";
@@ -166,7 +167,7 @@ class TagFactory
             } elseif (self::$psrKeywords->contains($type) || preg_match('#[|\\\\<]#', $type) || (!$variable && !$description)) {
                 $description = "$variable $description";
                 $variable = $token->getName();
-                $types->addAll($this->parseTypes($type));
+                $types->addAll($this->parseTypes($type, $token));
             } else {
                 $th = $token->getTypehint();
                 if ($th !== null && $th->getTypeName() !== 'mixed') {
@@ -196,7 +197,7 @@ class TagFactory
                     $types[] = $pt;
                 }
             } else {
-                $types->addAll($this->parseTypes($type));
+                $types->addAll($this->parseTypes($type, $token));
             }
         }
         return new ParameterTag($matches[1], $types, $variable, $description);
@@ -212,11 +213,11 @@ class TagFactory
      * @param $hints - The hints to parse
      * @return - The typehints contained
      */
-    protected function parseTypes(string $hints): \ConstVector<ScannedTypehint>
+    protected function parseTypes(string $hints, ?ScannedBase $token = null): \ConstVector<ScannedTypehint>
     {
         $types = new \SplDoublyLinkedList();
         foreach (explode("|", trim($hints)) as $t) {
-            $typehint = $this->stringToTypehint($t);
+            $typehint = $this->stringToTypehint($t, $token);
             if ($typehint !== null) {
                 /* HH_IGNORE_ERROR[4006]: Bug in typechecker */
                 $types[] = $typehint;
@@ -231,7 +232,7 @@ class TagFactory
      * @param $t - The string typehint
      * @return - The scanned typehint or null
      */
-    protected function stringToTypehint(string $t): ?ScannedTypehint
+    protected function stringToTypehint(string $t, ?ScannedBase $token = null): ?ScannedTypehint
     {
         $typehint = null;
         if (self::$thisy->contains($t) || self::$notTypes->contains($t)) {
@@ -239,14 +240,17 @@ class TagFactory
         } elseif (self::$replaceTypes->containsKey($t)) {
             $t = self::$replaceTypes[$t];
         }
+        if ($t === '-') {
+            return $typehint;
+        }
         if (strlen($t) > 0) {
             if (preg_match('/\[\]$/', $t)) {
                 // tags like @param Foo[] $stuff The stuff
                 // should be @param array<Foo> $stuff The stuff
                 $t = 'array<' . substr($t, 0, -2) . '>';
             }
-            $token = '<?hh function test(' . $t . ' $a) {}';
-            $tq = new \FredEmmott\DefinitionFinder\TokenQueue($token);
+            $sourceCode = '<?hh function test(' . $t . ' $a) {}';
+            $tq = new \FredEmmott\DefinitionFinder\TokenQueue($sourceCode);
             while ($tq->haveTokens()) {
                 $tk = $tq->shift();
                 if ($tk[0] === '(') {
@@ -254,9 +258,16 @@ class TagFactory
                 }
             }
             try {
-                $tc = new \FredEmmott\DefinitionFinder\TypehintConsumer($tq, Map{});
+                $tc = new \FredEmmott\DefinitionFinder\TypehintConsumer($tq, shape(
+                  'filename' => $token?->getFileName() ?? '',
+                  'sourceType' => $token?->getSourceType() ?? \FredEmmott\DefinitionFinder\SourceType::HACK_PARTIAL,
+                  'namespace' => $token?->getNamespaceName(),
+                  'aliases' => ImmMap{}, // TODO can we get this?
+                  'genericTypeNames' => ImmSet{}, // TODO can we get this?
+                ));
                 $typehint = $tc->getTypehint();
             } catch (\Exception $e) {
+                throw $e;
             }
         }
         return $typehint;

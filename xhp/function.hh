@@ -49,7 +49,7 @@ class :hphpdoc:function extends :x:element implements HasXHPHelpers
                 <h1>{$name}</h1>
                 {$labels}
             </header>
-            <div class="method-signature">
+            <div class="signature function-signature">
                 {"function "}
                 <code class="method-name">{$name}</code>
                 <hphpdoc:generics generics={$token->getGenericTypes()}/>

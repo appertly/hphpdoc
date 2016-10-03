@@ -40,7 +40,7 @@ class :hphpdoc:constants extends :x:element implements HasXHPHelpers
 
     protected function render(): XHPRoot
     {
-        $section = <section class="constant-details">
+        $section = <section class="symbol-details constant-details">
             <header>
                 <h1>Constant Details</h1>
             </header>

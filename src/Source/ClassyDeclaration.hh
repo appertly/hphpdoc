@@ -34,6 +34,7 @@ class ClassyDeclaration implements TokenDeclaration<ScannedClass>
     private ImmMap<string,PropertyDeclaration> $properties;
     private ImmMap<string,MethodDeclaration> $methods;
     private ImmMap<string,ConstantDeclaration> $constants;
+    private ImmMap<string,TypeConstantDeclaration> $typeConstants;
 
     /**
      * Creates a new ClassDeclaration.
@@ -47,10 +48,12 @@ class ClassyDeclaration implements TokenDeclaration<ScannedClass>
         \ConstMap<string,PropertyDeclaration> $properties,
         \ConstMap<string,MethodDeclaration> $methods,
         \ConstMap<string,ConstantDeclaration> $constants,
+        \ConstMap<string,TypeConstantDeclaration> $typeConstants,
     ) {
         $this->properties = $properties->toImmMap();
         $this->methods = $methods->toImmMap();
         $this->constants = $constants->toImmMap();
+        $this->typeConstants = $typeConstants->toImmMap();
     }
 
     /**
@@ -74,7 +77,7 @@ class ClassyDeclaration implements TokenDeclaration<ScannedClass>
             }
         }
         foreach ($parents as $pi) {
-            $p = $mapper->getClass($pi) ?? $mapper->getClass($token->getNamespaceName() . '\\' . $pi) ?? null;
+            $p = $mapper->getClass($pi);
             if ($p instanceof ClassyDeclaration) {
                 $block = $block->inherit($p->getDocBlock());
             }
@@ -86,6 +89,7 @@ class ClassyDeclaration implements TokenDeclaration<ScannedClass>
             self::mergeProperties($token, $parser, $mapper),
             self::mergeMethods($token, $parser, $mapper),
             self::mergeConstants($token, $parser, $mapper),
+            self::mergeTypeConstants($token, $parser, $mapper),
         );
     }
 
@@ -205,6 +209,27 @@ class ClassyDeclaration implements TokenDeclaration<ScannedClass>
     }
 
     /**
+     * Gets all type constants in this class by name
+     *
+     * @return - All type constants in this class
+     */
+    public function getTypeConstants(): \ConstMap<string,TypeConstantDeclaration>
+    {
+        return $this->typeConstants;
+    }
+
+    /**
+     * Gets a type constant by name
+     *
+     * @param $name - The constant name
+     * @return - The type constant found or `null`
+     */
+    public function getTypeConstant(string $name): ?TypeConstantDeclaration
+    {
+        return $this->typeConstants->get($name);
+    }
+
+    /**
      * Grab any inherited constants and make sure doc blocks are inherited.
      *
      * @param $c - The token
@@ -215,9 +240,15 @@ class ClassyDeclaration implements TokenDeclaration<ScannedClass>
     protected static function mergeConstants(ScannedClass $c, Parser $parser, Mapper $mapper): \ConstMap<string,ConstantDeclaration>
     {
         $members = Map{};
-        $pi = $c->getParentClassName();
-        if ($pi !== null) {
-            $p = $mapper->getClass($pi) ?? $mapper->getClass($c->getNamespaceName() . '\\' . $pi);
+        $parents = Vector{};
+        $parents->addAll($c->getInterfaceNames());
+        $pcn = $c->getParentClassName();
+        if ($pcn !== null) {
+            $parents[] = $pcn;
+        }
+        $parents->addAll($c->getTraitNames());
+        foreach ($parents as $pi) {
+            $p = $mapper->getClass($pi);
             if ($p instanceof ClassyDeclaration) {
                 $members->setAll($p->getConstants());
             }
@@ -234,6 +265,40 @@ class ClassyDeclaration implements TokenDeclaration<ScannedClass>
     }
 
     /**
+     * Grab any inherited constants and make sure doc blocks are inherited.
+     *
+     * @param $c - The token
+     * @param $parser - The doc block parser
+     * @param $mapper - The mapper
+     * @return - The constants by name
+     */
+    protected static function mergeTypeConstants(ScannedClass $c, Parser $parser, Mapper $mapper): \ConstMap<string,TypeConstantDeclaration>
+    {
+        $members = Map{};
+        $parents = Vector{};
+        $parents->addAll($c->getInterfaceNames());
+        $pcn = $c->getParentClassName();
+        if ($pcn !== null) {
+            $parents[] = $pcn;
+        }
+        foreach ($parents as $pi) {
+            $p = $mapper->getClass($pi);
+            if ($p instanceof ClassyDeclaration) {
+                $members->setAll($p->getTypeConstants());
+            }
+        }
+        foreach ($c->getTypeConstants() as $m) {
+            $name = $m->getName();
+            $block = $parser->parse($m);
+            if ($members->containsKey($name)) {
+                $block = $block->inherit($members[$name]->getDocBlock());
+            }
+            $members[$name] = new TypeConstantDeclaration($m, $block, $c);
+        }
+        return $members;
+    }
+
+    /**
      * Grab any inherited properties and make sure doc blocks are inherited.
      *
      * @param $c - The token
@@ -244,9 +309,14 @@ class ClassyDeclaration implements TokenDeclaration<ScannedClass>
     protected static function mergeProperties(ScannedClass $c, Parser $parser, Mapper $mapper): \ConstMap<string,PropertyDeclaration>
     {
         $members = Map{};
-        $pi = $c->getParentClassName();
-        if ($pi !== null) {
-            $p = $mapper->getClass($pi) ?? $mapper->getClass($c->getNamespaceName() . '\\' . $pi);
+        $parents = Vector{};
+        $pcn = $c->getParentClassName();
+        if ($pcn !== null) {
+            $parents[] = $pcn;
+        }
+        $parents->addAll($c->getTraitNames());
+        foreach ($parents as $pi) {
+            $p = $mapper->getClass($pi);
             if ($p instanceof ClassyDeclaration) {
                 $members->setAll($p->getProperties());
             }
@@ -274,13 +344,14 @@ class ClassyDeclaration implements TokenDeclaration<ScannedClass>
     {
         $members = Map{};
         $parents = Vector{};
+        $parents->addAll($c->getInterfaceNames());
         $pcn = $c->getParentClassName();
         if ($pcn !== null) {
             $parents[] = $pcn;
         }
-        $parents->addAll($c->getInterfaceNames());
+        $parents->addAll($c->getTraitNames());
         foreach ($parents as $pi) {
-            $p = $mapper->getClass($pi) ?? $mapper->getClass($c->getNamespaceName() . '\\' . $pi);
+            $p = $mapper->getClass($pi);
             if ($p instanceof ClassyDeclaration) {
                 $members->setAll($p->getMethods());
             }

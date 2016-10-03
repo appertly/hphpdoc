@@ -40,7 +40,7 @@ class :hphpdoc:functions extends :x:element implements HasXHPHelpers
 
     protected function render(): XHPRoot
     {
-        $section = <section class="method-details">
+        $section = <section class="symbol-details function-details">
             <header>
                 <h1>Function Details</h1>
             </header>

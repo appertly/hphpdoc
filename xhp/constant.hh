@@ -47,8 +47,9 @@ class :hphpdoc:constant extends :x:element implements HasXHPHelpers
         $mclass = $m->getClass();
         if ($mclass !== null && $cd instanceof Hphpdoc\Source\ClassyDeclaration
                 && $mclass->getName() !== $cd->getName()) {
+            $th = new FredEmmott\DefinitionFinder\ScannedTypehint($mclass->getName(), Vector{}, false);
             $labels->appendChild(
-                <span class="label">Inherited from {$this->abbrClass($mclass->getName())}</span>
+                <span class="label">Inherited from <hphpdoc:typehint token={$th}/></span>
             );
         }
         return <section id={"constant_" . $m->getToken()->getShortName()} class="constant-section">
@@ -56,7 +57,7 @@ class :hphpdoc:constant extends :x:element implements HasXHPHelpers
                 <h1>{$m->getToken()->getShortName()}</h1>
                 {$labels}
             </header>
-            <div class="constant-signature">
+            <div class="signature constant-signature">
                 {"const "}
                 <code class="constant-type">
                     <hphpdoc:typehint token={$rt}/>
@@ -76,11 +77,5 @@ class :hphpdoc:constant extends :x:element implements HasXHPHelpers
                 <hphpdoc:links block={$phpdoc}/>
             </div>
         </section>;
-    }
-
-    private function abbrClass(string $name): XHPChild
-    {
-        return strpos($name, '\\') !== false ?
-            <abbr title={$name}>{substr(strrchr($name, '\\'), 1)}</abbr> : $name;
     }
 }

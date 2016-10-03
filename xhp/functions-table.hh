@@ -60,7 +60,7 @@ class :hphpdoc:functions-table extends :x:element implements HasXHPHelpers
                 <tr>
                     <td><hphpdoc:typehints tokens={$rt}/></td>
                     <td>
-                        <div class="method-signature">
+                        <div class="signature function-signature">
                         <code class="method-name"><a href={"functions-$ns.html#function_" . $name}>{$name}</a></code>
                         <hphpdoc:generics generics={$m->getToken()->getGenericTypes()}/>
                         <hphpdoc:parameters member={$m}/>
@@ -74,7 +74,7 @@ class :hphpdoc:functions-table extends :x:element implements HasXHPHelpers
         if ($title) {
             $header = <header><h1>{$title}</h1></header>;
         }
-        return <section class="functions-index">
+        return <section class="symbol-index functions-index">
             {$header}
             <table>
                 <thead>

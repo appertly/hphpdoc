@@ -34,10 +34,10 @@ use FredEmmott\DefinitionFinder\ScannedType;
  */
 trait Producer
 {
-    static private ImmSet<string> $primitives = ImmSet{'null', 'string', 'int',
+    static protected ImmSet<string> $primitives = ImmSet{'null', 'string', 'int',
         'integer', 'float', 'real', 'double', 'bool', 'boolean', 'resource',
         'array', 'arraykey', 'num', 'callable', 'mixed', 'true', 'false'};
-    static private ImmSet<string> $thisy = ImmSet{'self', 'this', '$this',
+    static protected ImmSet<string> $thisy = ImmSet{'self', 'this', '$this',
         'static'};
 
     /**

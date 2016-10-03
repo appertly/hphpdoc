@@ -59,7 +59,7 @@ class :hphpdoc:classlike-table extends :x:element implements HasXHPHelpers
         }
         $title = $this->:title;
         $this->removeAttribute('title');
-        return <section>
+        return <section class="symbol-index">
             <header>
                 <h1>{$title}</h1>
             </header>

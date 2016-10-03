@@ -23,6 +23,7 @@ use Hphpdoc\Source\ClassyDeclaration;
 use Hphpdoc\Source\ConstantDeclaration;
 use Hphpdoc\Source\MethodDeclaration;
 use Hphpdoc\Source\PropertyDeclaration;
+use Hphpdoc\Source\TypeConstantDeclaration;
 use Hphpdoc\Job;
 
 /**
@@ -68,6 +69,42 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
             $implements->appendChild(<hphpdoc:typehint token={$v}/>);
         }
 
+        $traits = $sc->getTraitGenerics();
+        $usesBlock = null;
+        if (!$traits->isEmpty()) {
+            $usesBlock = <div class="signature class-uses-signature"/>;
+            foreach ($traits as $name => $generics) {
+                $usesBlock->appendChild(
+                    <div>
+                        <code class="class-use">
+                            {"use "}
+                            <hphpdoc:typehint token={new \FredEmmott\DefinitionFinder\ScannedTypehint($name, $generics, false)}/>
+                        </code>
+                    </div>
+                );
+            }
+        }
+        $typeConstants = $class->getTypeConstants();
+        $typeConstantsBlock = null;
+        if (!$typeConstants->isEmpty()) {
+            $typeConstantsBlock = <div class="signature class-type-constants-signature"/>;
+            foreach ($typeConstants as $tc) {
+                $name = $tc->getToken()->getShortName();
+                $typeConstantsBlock->appendChild(
+                    <div>
+                        <code class="class-type-constant">
+                            {"const type "}
+                            <code class="constant-name"><a href={"#type_constant_$name"}>{$name}</a></code>
+                            <code class="separator-constant">{" = "}</code>
+                            <code class="constant-type">
+                                <hphpdoc:typehint token={$tc->getType()}/>
+                            </code>
+                        </code>
+                    </div>
+                );
+            }
+        }
+
         $block = $class->getDocBlock();
         $mdParser = $this->getMarkdownParser();
         $main = <main role="main">
@@ -79,7 +116,10 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
                     <span class="class-name">{$sc->getShortName()}</span>
                     <hphpdoc:generics generics={$sc->getGenericTypes()}/>
                 </h1>
-                <div class="class-signature">
+                <div class="class-summary"><axe:markdown text={$block->getSummary()} docParser={$mdParser}/></div>
+            </header>
+            <div class="symbol-details class-details">
+                <div class="signature class-signature">
                     {$finality}
                     {$abstractness}
                     <code class="class-type">{$sc->isTrait() ? "trait " : ($sc->isInterface() ? "interface " : "class ")}</code>
@@ -88,14 +128,15 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
                     {$extends}
                     {$implements}
                 </div>
-                <div class="class-summary"><axe:markdown text={$block->getSummary()} docParser={$mdParser}/></div>
-            </header>
-            <div class="class-description">
-                <axe:markdown text={$block->getDescription()} docParser={$mdParser}/>
+                {$usesBlock}
+                {$typeConstantsBlock}
+                <div class="class-description">
+                    <axe:markdown text={$block->getDescription()} docParser={$mdParser}/>
+                </div>
+                <hphpdoc:authorship block={$block}/>
+                <hphpdoc:versions block={$block}/>
+                <hphpdoc:links block={$block}/>
             </div>
-            <hphpdoc:authorship block={$block}/>
-            <hphpdoc:versions block={$block}/>
-            <hphpdoc:links block={$block}/>
         </main>;
 
         $methods = $class->getMethods();
@@ -109,10 +150,28 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
         $main->appendChild(<hphpdoc:methods-table title="Constructors / Destructors" methods={$methodsv->filter($a ==> !!preg_match('/^__(con|de)struct$/', $a->getName()))} />);
         $main->appendChild(<hphpdoc:methods-table title="Instance Methods" methods={$methodsv->filter($a ==> !$a->getToken()->isStatic() && !preg_match('/^__(con|de)struct$/', $a->getName()))} />);
         $main->appendChild(<hphpdoc:methods-table title="Static Methods" methods={$methodsv->filter($a ==> $a->getToken()->isStatic())} />);
+        $this->appendTypeConstants($main, $typeConstants);
         $this->appendConstants($main, $constants);
         $this->appendProperties($main, $properties);
         $this->appendMethods($main, $methods);
         return $main;
+    }
+
+    protected function appendTypeConstants(:main $main, \ConstMap<string,TypeConstantDeclaration> $typeConstants): void
+    {
+        if (count($typeConstants) > 0) {
+            $typeConstants = new Map($typeConstants);
+            ksort($typeConstants);
+            $section = <section class="symbol-details constant-details">
+                <header>
+                    <h1>Type Constant Details</h1>
+                </header>
+            </section>;
+            foreach ($typeConstants as $m) {
+                $section->appendChild(<hphpdoc:type-constant constant={$m}/>);
+            }
+            $main->appendChild($section);
+        }
     }
 
     protected function appendConstants(:main $main, \ConstMap<string,ConstantDeclaration> $constants): void
@@ -120,7 +179,7 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
         if (count($constants) > 0) {
             $constants = new Map($constants);
             ksort($constants);
-            $section = <section class="constant-details">
+            $section = <section class="symbol-details constant-details">
                 <header>
                     <h1>Constant Details</h1>
                 </header>
@@ -138,7 +197,7 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
         if (count($membersByName) > 0) {
             $members = new Map($membersByName);
             ksort($members);
-            $section = <section class="property-details">
+            $section = <section class="symbol-details property-details">
                 <header>
                     <h1>Property Details</h1>
                 </header>
@@ -156,7 +215,7 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
         if (count($membersByName) > 0) {
             $members = new Map($membersByName);
             ksort($members);
-            $section = <section class="method-details">
+            $section = <section class="symbol-details method-details">
                 <header>
                     <h1>Method Details</h1>
                 </header>

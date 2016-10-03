@@ -55,11 +55,20 @@ class :hphpdoc:typehint extends :x:element implements HasXHPHelpers
             $tag->appendChild(<code class="primitive">{$base}</code>);
         } elseif ($this->isThisy($type)) {
             $tag->appendChild(<code class="ref"><a href="#">{$this->abbrClass($base)}</a></code>);
-        } elseif (substr($base, 0, 1) == '\\') {
-            if ($tbn->containsKey(substr($base, 1))) {
-                $tag->appendChild(<code class="ref"><a href={$this->getFilename($tbn[substr($base, 1)])}>{$this->abbrClass(substr($base, 1))}</a></code>);
+        } elseif (strpos($base, '::') !== false) {
+            list($tname, $tconst) = explode('::', $base, 2);
+            if (self::$thisy->contains($tname)) {
+                $tag->appendChild(<code class="ref"><a href={"#type_constant_$tconst"}>{$base}</a></code>);
+            } elseif ($tbn->containsKey($tname)) {
+                $tag->appendChild(<code class="ref"><a href={$this->getFilename($tbn[$tname]) . "#type_constant_$tconst"}>{$this->abbrClass($tname)}{"::$tconst"}</a></code>);
             } else {
-                $tag->appendChild(<code class="ref">{$this->abbrClass(substr($base, 1))}</code>);
+                $tag->appendChild(<code class="ref">{$this->abbrClass($tname)}{"::$tconst"}</code>);
+            }
+        } elseif (strpos($base, '\\') !== false) {
+            if ($tbn->containsKey($base)) {
+                $tag->appendChild(<code class="ref"><a href={$this->getFilename($tbn[$base])}>{$this->abbrClass($base)}</a></code>);
+            } else {
+                $tag->appendChild(<code class="ref">{$this->abbrClass($base)}</code>);
             }
         } elseif ($cd instanceof Hphpdoc\Source\ClassyDeclaration) {
             $sc = $cd->getToken();
