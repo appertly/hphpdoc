@@ -216,17 +216,22 @@ td .method-summary p
     text-align: left;
 }
 
-.method-section, .property-section, .constant-section {
+.symbol-details > section {
     background-color: #f3f3f3;
     padding: 1.25em;
     padding-bottom: 1px;
     padding-top: 19px;
     margin-bottom: 1.25em;
 }
-.method-section .method-signature, .property-section .property-signature, .constant-section .constant-signature, .class-signature {
+.symbol-details .signature {
     padding: 1.25em;
     color: #FDF6E3;
     background-color: #073642;
+}
+.symbol-details .class-uses-signature,
+.symbol-details .class-type-constants-signature {
+    padding-left: 2.5em;
+    padding-top: 0;
 }
 
 .class-name, .ref, .ref a {
