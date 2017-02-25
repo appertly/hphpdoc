@@ -18,7 +18,7 @@
  * @license   Apache-2.0
  */
 
-use FredEmmott\DefinitionFinder\ScannedConstant;
+use Facebook\DefinitionFinder\ScannedConstant;
 use Hphpdoc\Source\ClassyDeclaration;
 use Hphpdoc\Source\ConstantDeclaration;
 use Hphpdoc\Source\MethodDeclaration;
@@ -78,7 +78,7 @@ class :hphpdoc:classlike extends :x:element implements HasXHPHelpers
                     <div>
                         <code class="class-use">
                             {"use "}
-                            <hphpdoc:typehint token={new \FredEmmott\DefinitionFinder\ScannedTypehint($name, $generics, false)}/>
+                            <hphpdoc:typehint token={new \Facebook\DefinitionFinder\ScannedTypehint($name, $generics, false)}/>
                         </code>
                     </div>
                 );

@@ -47,7 +47,7 @@ class :hphpdoc:type-constant extends :x:element implements HasXHPHelpers
         $mclass = $m->getClass();
         if ($mclass !== null && $cd instanceof Hphpdoc\Source\ClassyDeclaration
                 && $mclass->getName() !== $cd->getName()) {
-            $th = new FredEmmott\DefinitionFinder\ScannedTypehint($mclass->getName(), Vector{}, false);
+            $th = new Facebook\DefinitionFinder\ScannedTypehint($mclass->getName(), Vector{}, false);
             $labels->appendChild(
                 <span class="label">Inherited from <hphpdoc:typehint token={$th}/></span>
             );

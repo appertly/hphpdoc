@@ -18,12 +18,12 @@
  * @license   Apache-2.0
  */
 
-use FredEmmott\DefinitionFinder\ScannedBasicClass;
-use FredEmmott\DefinitionFinder\ScannedBase;
-use FredEmmott\DefinitionFinder\ScannedConstant;
-use FredEmmott\DefinitionFinder\ScannedTrait;
-use FredEmmott\DefinitionFinder\ScannedInterface;
-use FredEmmott\DefinitionFinder\ScannedFunction;
+use Facebook\DefinitionFinder\ScannedBasicClass;
+use Facebook\DefinitionFinder\ScannedBase;
+use Facebook\DefinitionFinder\ScannedConstant;
+use Facebook\DefinitionFinder\ScannedTrait;
+use Facebook\DefinitionFinder\ScannedInterface;
+use Facebook\DefinitionFinder\ScannedFunction;
 use Hphpdoc\Source\TokenDeclaration;
 use Hphpdoc\Job;
 

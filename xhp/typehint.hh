@@ -31,7 +31,7 @@ class :hphpdoc:typehint extends :x:element implements HasXHPHelpers
     attribute :xhp:html-element,
         bool returnType = false,
         ?bool nullable = null,
-        ?FredEmmott\DefinitionFinder\ScannedTypehint token @required;
+        ?Facebook\DefinitionFinder\ScannedTypehint token @required;
 
     protected function render(): XHPRoot
     {

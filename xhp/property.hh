@@ -48,7 +48,7 @@ class :hphpdoc:property extends :x:element implements HasXHPHelpers
         $labels = <p class="method-labels"/>;
         $mclass = $m->getClass();
         if ($cd->getName() !== $mclass->getName()) {
-            $th = new FredEmmott\DefinitionFinder\ScannedTypehint($mclass->getName(), Vector{}, false);
+            $th = new Facebook\DefinitionFinder\ScannedTypehint($mclass->getName(), Vector{}, false);
             $labels->appendChild(
                 <span class="label">Inherited from <hphpdoc:typehint token={$th}/></span>
             );
