@@ -19,8 +19,8 @@
  */
 namespace Hphpdoc\Source;
 
-use FredEmmott\DefinitionFinder\ScannedClass;
-use FredEmmott\DefinitionFinder\ScannedMethod;
+use Facebook\DefinitionFinder\ScannedClass;
+use Facebook\DefinitionFinder\ScannedMethod;
 use Hphpdoc\Doc\Block;
 use Hphpdoc\Doc\ParameterTag;
 use Hphpdoc\Doc\TypedTag;

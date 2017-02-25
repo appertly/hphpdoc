@@ -19,7 +19,7 @@
  */
 namespace Hphpdoc\Doc;
 
-use FredEmmott\DefinitionFinder\ScannedBase;
+use Facebook\DefinitionFinder\ScannedBase;
 
 /**
  * Parses doc comments

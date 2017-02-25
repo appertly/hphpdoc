@@ -19,7 +19,7 @@
  */
 namespace Hphpdoc;
 
-use FredEmmott\DefinitionFinder\ScannedBase;
+use Facebook\DefinitionFinder\ScannedBase;
 
 /**
  * Contains details of a job run.

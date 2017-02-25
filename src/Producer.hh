@@ -20,14 +20,14 @@
 namespace Hphpdoc;
 
 use Axe\Page;
-use FredEmmott\DefinitionFinder\ScannedBase;
-use FredEmmott\DefinitionFinder\ScannedClass;
-use FredEmmott\DefinitionFinder\ScannedEnum;
-use FredEmmott\DefinitionFinder\ScannedMethod;
-use FredEmmott\DefinitionFinder\ScannedNewtype;
-use FredEmmott\DefinitionFinder\ScannedProperty;
-use FredEmmott\DefinitionFinder\ScannedTypehint;
-use FredEmmott\DefinitionFinder\ScannedType;
+use Facebook\DefinitionFinder\ScannedBase;
+use Facebook\DefinitionFinder\ScannedClass;
+use Facebook\DefinitionFinder\ScannedEnum;
+use Facebook\DefinitionFinder\ScannedMethod;
+use Facebook\DefinitionFinder\ScannedNewtype;
+use Facebook\DefinitionFinder\ScannedProperty;
+use Facebook\DefinitionFinder\ScannedTypehint;
+use Facebook\DefinitionFinder\ScannedType;
 
 /**
  * Contains helper methods for anything which generates content.

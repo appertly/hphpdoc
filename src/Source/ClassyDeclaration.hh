@@ -19,10 +19,10 @@
  */
 namespace Hphpdoc\Source;
 
-use FredEmmott\DefinitionFinder\ScannedBase;
-use FredEmmott\DefinitionFinder\ScannedClass;
-use FredEmmott\DefinitionFinder\ScannedMethod;
-use FredEmmott\DefinitionFinder\ScannedProperty;
+use Facebook\DefinitionFinder\ScannedBase;
+use Facebook\DefinitionFinder\ScannedClass;
+use Facebook\DefinitionFinder\ScannedMethod;
+use Facebook\DefinitionFinder\ScannedProperty;
 use Hphpdoc\Doc\Block;
 use Hphpdoc\Doc\Parser;
 

@@ -19,9 +19,9 @@
  */
 namespace Hphpdoc\Source;
 
-use FredEmmott\DefinitionFinder\ScannedClass;
-use FredEmmott\DefinitionFinder\ScannedTypeConstant;
-use FredEmmott\DefinitionFinder\ScannedTypehint;
+use Facebook\DefinitionFinder\ScannedClass;
+use Facebook\DefinitionFinder\ScannedTypeConstant;
+use Facebook\DefinitionFinder\ScannedTypehint;
 use Hphpdoc\Doc\Block;
 use Hphpdoc\Doc\TypedTag;
 

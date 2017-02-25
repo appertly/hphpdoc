@@ -19,7 +19,7 @@
  */
 namespace Hphpdoc\Source;
 
-use FredEmmott\DefinitionFinder\ScannedFunctionAbstract;
+use Facebook\DefinitionFinder\ScannedFunctionAbstract;
 use Hphpdoc\Doc\ParameterTag;
 use Hphpdoc\Doc\TypedTag;
 

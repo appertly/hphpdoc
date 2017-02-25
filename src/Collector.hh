@@ -19,9 +19,9 @@
  */
 namespace Hphpdoc;
 
-use FredEmmott\DefinitionFinder\FileParser;
-use FredEmmott\DefinitionFinder\TreeParser;
-use FredEmmott\DefinitionFinder\ScannedBase;
+use Facebook\DefinitionFinder\FileParser;
+use Facebook\DefinitionFinder\TreeParser;
+use Facebook\DefinitionFinder\ScannedBase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerAwareTrait;
 
