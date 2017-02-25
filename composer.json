@@ -18,7 +18,7 @@
         "psr/log": "^1.0.0"
     },
     "require-dev": {
-	"hackpack/hackunit": "~0.6",
+        "hackpack/hackunit": "~0.6",
         "libreworks/psr3-log-hhi": "^1.0.0"
     },
     "autoload": {
