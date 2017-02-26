@@ -20,10 +20,10 @@
 namespace Hphpdoc;
 
 use Axe\Page;
-use FredEmmott\DefinitionFinder\ScannedBase;
-use FredEmmott\DefinitionFinder\ScannedClass;
-use FredEmmott\DefinitionFinder\ScannedConstant;
-use FredEmmott\DefinitionFinder\ScannedFunction;
+use Facebook\DefinitionFinder\ScannedBase;
+use Facebook\DefinitionFinder\ScannedClass;
+use Facebook\DefinitionFinder\ScannedConstant;
+use Facebook\DefinitionFinder\ScannedFunction;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerAwareTrait;
 use League\CommonMark\DocParser;

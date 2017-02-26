@@ -29,7 +29,7 @@ class :hphpdoc:typehints extends :x:element implements HasXHPHelpers
     children empty;
     attribute :xhp:html-element,
         bool returnType = false,
-        ConstVector<?FredEmmott\DefinitionFinder\ScannedTypehint> tokens @required;
+        ConstVector<?Facebook\DefinitionFinder\ScannedTypehint> tokens @required;
 
     protected function render(): XHPRoot
     {

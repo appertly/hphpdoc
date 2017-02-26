@@ -18,7 +18,7 @@
  * @license   Apache-2.0
  */
 
-use FredEmmott\DefinitionFinder\ScannedFunctionAbstract;
+use Facebook\DefinitionFinder\ScannedFunctionAbstract;
 use Hphpdoc\Source\FunctionyDeclaration;
 use League\CommonMark\DocParser;
 

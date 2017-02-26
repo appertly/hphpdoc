@@ -19,7 +19,7 @@
  */
 namespace Hphpdoc\Doc;
 
-use FredEmmott\DefinitionFinder\ScannedTypehint;
+use Facebook\DefinitionFinder\ScannedTypehint;
 
 /**
  * Any tag that includes only a typehint and a description.

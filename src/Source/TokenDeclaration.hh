@@ -19,7 +19,7 @@
  */
 namespace Hphpdoc\Source;
 
-use FredEmmott\DefinitionFinder\ScannedBase;
+use Facebook\DefinitionFinder\ScannedBase;
 
 /**
  * A thing and its corresponding doc block

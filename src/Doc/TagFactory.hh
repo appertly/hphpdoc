@@ -19,12 +19,12 @@
  */
 namespace Hphpdoc\Doc;
 
-use FredEmmott\DefinitionFinder\ScannedBase;
-use FredEmmott\DefinitionFinder\ScannedConstant;
-use FredEmmott\DefinitionFinder\ScannedFunctionAbstract;
-use FredEmmott\DefinitionFinder\ScannedMethod;
-use FredEmmott\DefinitionFinder\ScannedProperty;
-use FredEmmott\DefinitionFinder\ScannedTypehint;
+use Facebook\DefinitionFinder\ScannedBase;
+use Facebook\DefinitionFinder\ScannedConstant;
+use Facebook\DefinitionFinder\ScannedFunctionAbstract;
+use Facebook\DefinitionFinder\ScannedMethod;
+use Facebook\DefinitionFinder\ScannedProperty;
+use Facebook\DefinitionFinder\ScannedTypehint;
 
 /**
  * Creates tags.
@@ -250,7 +250,7 @@ class TagFactory
                 $t = 'array<' . substr($t, 0, -2) . '>';
             }
             $sourceCode = '<?hh function test(' . $t . ' $a) {}';
-            $tq = new \FredEmmott\DefinitionFinder\TokenQueue($sourceCode);
+            $tq = new \Facebook\DefinitionFinder\TokenQueue($sourceCode);
             while ($tq->haveTokens()) {
                 $tk = $tq->shift();
                 if ($tk[0] === '(') {
@@ -258,9 +258,9 @@ class TagFactory
                 }
             }
             try {
-                $tc = new \FredEmmott\DefinitionFinder\TypehintConsumer($tq, shape(
+                $tc = new \Facebook\DefinitionFinder\TypehintConsumer($tq, shape(
                   'filename' => $token?->getFileName() ?? '',
-                  'sourceType' => $token?->getSourceType() ?? \FredEmmott\DefinitionFinder\SourceType::HACK_PARTIAL,
+                  'sourceType' => $token?->getSourceType() ?? \Facebook\DefinitionFinder\SourceType::HACK_PARTIAL,
                   'namespace' => $token?->getNamespaceName(),
                   'aliases' => ImmMap{}, // TODO can we get this?
                   'genericTypeNames' => ImmSet{}, // TODO can we get this?

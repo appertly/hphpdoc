@@ -18,7 +18,7 @@
  * @license   Apache-2.0
  */
 
-use FredEmmott\DefinitionFinder\ScannedConstant;
+use Facebook\DefinitionFinder\ScannedConstant;
 use Hphpdoc\Source\ClassyDeclaration;
 use Hphpdoc\Source\MethodDeclaration;
 use Hphpdoc\Source\PropertyDeclaration;

@@ -11,7 +11,7 @@
     },
     "require": {
         "hhvm": "~3.12",
-        "fredemmott/definition-finder": "^1.3.3",
+        "facebook/definition-finder": "1.4.*",
         "appertly/cleopatra": "~0.1",
         "appertly/axe": "~0.1",
         "appertly/axe-markdown": "~0.1",

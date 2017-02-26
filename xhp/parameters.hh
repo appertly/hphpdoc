@@ -18,7 +18,7 @@
  * @license   Apache-2.0
  */
 
-use FredEmmott\DefinitionFinder\ScannedFunctionAbstract;
+use Facebook\DefinitionFinder\ScannedFunctionAbstract;
 
 /**
  * Renders method parameters.

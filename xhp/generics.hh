@@ -28,7 +28,7 @@ class :hphpdoc:generics extends :x:element implements HasXHPHelpers
     category %flow, %phrase;
     children empty;
     attribute :xhp:html-element,
-        ConstVector<FredEmmott\DefinitionFinder\ScannedGeneric> generics @required;
+        ConstVector<Facebook\DefinitionFinder\ScannedGeneric> generics @required;
 
     protected function render(): XHPRoot
     {
